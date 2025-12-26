@@ -1,0 +1,51 @@
+@import "tailwindcss";
+:root {
+  --colorPrimary: #242424;
+  --colorPrimaryHover: #494949;
+  --colorOnPrimary: #ffffff;
+  --background: #ffffff;
+  --onBackground: #414141;
+  --hintColor: #F7F7F7;
+  --colorText: #414141;
+  --colorGrey: #898989;
+}
+
+@theme {
+  --font-display: "Inter", sans-serif;
+  --color-background: var(--background);
+  --color-onBackground: var(--onBackground);
+  --color-hintColor: var(--hintColor);
+
+  --color-primary: var(--colorPrimary);
+  --color-primaryHover: var(--colorPrimaryHover);
+  --color-onPrimary: var(--colorOnPrimary);
+  --color-colorGrey: var(--colorGrey);
+
+  --color-colorText:  var(--colorText);
+}
+
+
+/* LOADER CSS */
+@keyframes bubble {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.2);
+    opacity: 1;
+  }
+}
+
+.animate-bubble {
+  animation: bubble 1s infinite ease-in-out;
+}
+
+.delay-200 {
+  animation-delay: 0.2s;
+}
+
+.delay-400 {
+  animation-delay: 0.4s;
+}
