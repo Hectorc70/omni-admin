@@ -15,7 +15,6 @@ import FormFileInput from "@/common/components/input-file";
 import { Button } from "@/common/components/button";
 import BusinessService from "@/modules/business/services/business.service";
 import LoaderComponent from "@/common/components/loader";
-import FormSelect from "@/common/components/select";
 import { useUser } from "@/hooks/use-user";
 interface BussinessFormProps {
   onBeforeSubmit: () => Promise<void>;
@@ -34,15 +33,12 @@ const BusinessForm: React.FC<BussinessFormProps> = ({ onBeforeSubmit }) => {
     try {
       setStatusScreen(ScreenStatus.loading)
       if (business?.uuid) {
+        data.uuid = business.uuid
         await BusinessService.updateBusiness(data)
         await onBeforeSubmit()
         toast.success('Negocio actualizado exitosamente')
         setStatusScreen(ScreenStatus.success)
         return
-      } else {
-        await BusinessService.createBusiness(data)
-        await onBeforeSubmit()
-        toast.success('Negocio creado exitosamente')
       }
       setStatusScreen(ScreenStatus.success)
     } catch (error: any) {
@@ -56,7 +52,6 @@ const BusinessForm: React.FC<BussinessFormProps> = ({ onBeforeSubmit }) => {
   const init = async () => {
     setValue('name', business?.name || '')
     setValue('description', business?.description || '')
-    setValue('category.id', business?.category!.id || 1)
   }
 
   useEffect(() => {
@@ -82,7 +77,7 @@ const BusinessForm: React.FC<BussinessFormProps> = ({ onBeforeSubmit }) => {
                   message: "El nombre es requerido"
                 },
               })} />
-          <FormSelect label="Categoría de tu negocio"
+          {/* <FormSelect label="Categoría de tu negocio"
             options={
               [
                 { label: 'Tiendas', value: 1 },
@@ -100,7 +95,7 @@ const BusinessForm: React.FC<BussinessFormProps> = ({ onBeforeSubmit }) => {
                   value: true,
                   message: "La categoría es requerida"
                 },
-              })} />
+              })} /> */}
 
         </div>
         <div className="w-full grid grid-cols-1 md:grid-cols-1 gap-4 mt-5">
@@ -125,15 +120,6 @@ const BusinessForm: React.FC<BussinessFormProps> = ({ onBeforeSubmit }) => {
                 required: {
                   value: business!.logo ? false : true,
                   message: "El logo es requerido"
-                },
-              })} />
-          <FormFileInput label="Banner de tú negocio"
-            name="bannerFile"
-            error={errors.bannerFile} register={register('bannerFile',
-              {
-                required: {
-                  value: business!.banner ? false : true,
-                  message: "El banner es requerido"
                 },
               })} />
         </div>

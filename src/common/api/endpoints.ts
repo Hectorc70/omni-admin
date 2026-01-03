@@ -8,8 +8,8 @@ export const EndpointsApp = {
     activateUser: `/users/activate/`,
   },
   business: {
-    create: `/business/create/`,
-    update: `/business/update/`,
+    create: `/business/`,
+    update: `/business`,
     updateContactInfo: `/business/contact-info/`,
     updateHours: `/business/hours/`,
   },

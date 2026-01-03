@@ -53,7 +53,7 @@ const HomePage: React.FC = () => {
       reverseOrder={false}
     />
     <div className="w-full h-full grid gap-5 grid-cols-1 sm:grid-cols-2 max-h-[400px]">
-      <CardContainerComponent title="Datos de tú negocio" titleChildren={<Chip text={user?.business?.category?.name || ""} />} onEditAction={() => setShowBusinessModal(true)}>
+      <CardContainerComponent title="Datos de tú negocio" onEditAction={() => setShowBusinessModal(true)}>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2">
           {/* Logo */}
           <div className="flex flex-col">
@@ -67,7 +67,7 @@ const HomePage: React.FC = () => {
             <span className="mt-2 text-lg font-bold text-colorText">{user?.business?.name}</span>
           </div>
           {/* Banner */}
-          <div className="flex flex-col">
+          {/* <div className="flex flex-col">
             <div className="w-60 h-36 rounded-lg overflow-hidden bg-gray-100 border border-gray-300">
               <img
                 src={user?.business?.banner || "/images/default-avatar.png"}
@@ -76,7 +76,7 @@ const HomePage: React.FC = () => {
               />
             </div>
             <span className="mt-2 text-lg font-bold text-colorText">Banner de tu negocio</span>
-          </div>
+          </div> */}
           {/* Description */}
           <div className="w-full col-span-2">
             <span className="font-bold text-colorText text-lg">Descripción</span>
@@ -88,13 +88,6 @@ const HomePage: React.FC = () => {
       </CardContainerComponent>
       <CardContainerComponent title='Datos de de contacto' onEditAction={() => setShowBusinessContactModal(true)} >
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {/* Email */}
-          <div className="flex flex-col">
-            <span className="font-bold text-colorText text-lg">Email</span>
-            <p className="text-colorGrey text-sm">
-              {user?.business?.email || "Sin email"}
-            </p>
-          </div>
           {/* Address */}
           <div className="flex flex-col">
             <span className="font-bold text-colorText text-lg">Dirección</span>
@@ -102,26 +95,9 @@ const HomePage: React.FC = () => {
               {user?.business?.full_address || "Sin dirección"}
             </p>
           </div>
-          {/* Phones */}
-          {user?.business?.phones && user?.business?.phones?.length > 0 && (
-            <>
-              {user.business.phones.map((phone, index) => (
-                <div className="flex flex-col" key={index}>
-                  <span className="font-bold text-colorText text-lg">{phone.name}</span>
-                  <p className="text-colorGrey text-sm">
-                    {phone.number_phone}
-                  </p>
-                </div>
-              ))}
-            </>
-          )}
         </div>
       </CardContainerComponent>
     </div>
-    <div className="w-full h-full grid gap-5 grid-cols-1 sm:grid-cols-2 max-h-[400px]">
-      <BusinessHoursComponent businessHours={user?.business?.business_hours || []} onBeforeSubmit={getData} />
-    </div>
-
     <ModalComponent show={showBusinessModal} setShow={() => setShowBusinessModal(false)}
       statusModal={ScreenStatus.success}
       disableClose={true}
