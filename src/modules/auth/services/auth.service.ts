@@ -7,25 +7,46 @@ import { type IUser } from "@/models/User/user.model";
 import axios from "axios";
 import { EndpointsApp } from "@/common/api/endpoints";
 
-
-const login = async (token: string): Promise<IUser> => {
+const activateUser = async (token: string, password: string): Promise<void> => {
+  const key = `activateUser${token}`;
+  const signal = createAbortableRequest(key);
+  try {
+    const response = await axiosPublic.post(EndpointsApp.auth.activateUser,
+      {
+        token,
+        password
+      },
+      { signal }
+    )
+    return response.data.data
+  } catch (e: any) {
+    throw handleError(e)
+  }
+}
+const login = async (email: string, password: string): Promise<IUser> => {
+  const key = `login${email}`;
+  const signal = createAbortableRequest(key);
   try {
 
     const response = await axiosPublic.post(EndpointsApp.auth.login,
       {
-        token,
-      }
+        email,
+        password
+      },
+      { signal }
     )
     const data = response.data.data
-    if (data.type_user == 2) {
-      throw new Error('No autorizado, el usuario no esta registrado como administrador de la plataforma de negocios')
-    }
     localStorage.setItem(lsRefreshToken, data.refresh_token)
     localStorage.setItem(lsAccessToken, data.access_token)
     await refreshToken()
     return await getDetailUser()
   } catch (e: any) {
+    if (axios.isCancel(e) || e.name === "CanceledError" || e.name === "AbortError") {
+      return Promise.reject(CANCELLED_REQUEST);
+    }
     throw handleError(e)
+  } finally {
+    delete controllers[key];
   }
 }
 const createAccount = async (token: string): Promise<IUser> => {
@@ -48,16 +69,24 @@ const createAccount = async (token: string): Promise<IUser> => {
 
 
 const refreshToken = async (): Promise<String> => {
+  const key = `refreshToken`;
+  const signal = createAbortableRequest(key);
   try {
     const response = await axiosPublic.post(EndpointsApp.auth.refreshToken,
       {
         refresh_token: localStorage.getItem(lsRefreshToken),
-      }
+      }, { signal }
     )
-    localStorage.setItem(lsAccessToken, response.data.data.token)
-    return response.data.data.token
+    localStorage.setItem(lsAccessToken, response.data.data.access_token)
+    localStorage.setItem(lsRefreshToken, response.data.data.refresh_token)
+    return response.data.data
   } catch (e: any) {
+    if (axios.isCancel(e) || e.name === "CanceledError" || e.name === "AbortError") {
+      return Promise.reject(CANCELLED_REQUEST);
+    }
     throw handleError(e)
+  } finally {
+    delete controllers[key];
   }
 }
 
@@ -83,7 +112,8 @@ const AuthService = {
   login,
   refreshToken,
   createAccount,
-  getDetailUser
+  getDetailUser,
+  activateUser
 }
 
 export default AuthService

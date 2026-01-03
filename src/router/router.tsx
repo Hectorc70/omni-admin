@@ -3,14 +3,12 @@ import { createBrowserRouter } from "react-router-dom";
 import { routeNames } from "./routes-names";
 import LoginPage from "@/modules/auth/pages/login/login";
 import AuthLayout from "@/modules/auth/layout/auth.layout";
-import RegisterPage from "@/modules/auth/pages/register/register";
 import RequireAuth from "@/hooks/authguard";
 import NotFoundPage from "@/layout/components/NotFound";
 import HomePage from "@/modules/business/pages/home/home";
 import StockPage from "@/modules/stock/pages/stock";
 import StockLayout from "@/modules/stock/layout/stock.layout";
-import ChatsLayout from "@/modules/chats/layout/chats.layout";
-import ChatsPage from "@/modules/chats/pages/chats.page";
+import ValidateUserPage from "@/modules/auth/pages/activateUser/activateUser";
 
 const router = createBrowserRouter([
   {
@@ -22,8 +20,12 @@ const router = createBrowserRouter([
         element: <LoginPage />,
       },
       {
-        path: routeNames.registerPage,
-        element: <RegisterPage />,
+        path: routeNames.loginPage,
+        element: <LoginPage />,
+      },
+      {
+        path: routeNames.ValidateUserPage,
+        element: <ValidateUserPage />,
       },
     ],
   },
@@ -45,16 +47,6 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: routeNames.chatsPage,
-        element: <ChatsLayout />,
-        children: [
-          {
-            path: routeNames.chatsPage,
-            element: <ChatsPage />,
-          },
-        ],
-      }
     ],
   },
 

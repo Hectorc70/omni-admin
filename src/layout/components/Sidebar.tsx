@@ -1,8 +1,4 @@
 import { NavLink, useNavigate } from "react-router-dom";
-// import logo from '@/assets/logo-w.png'
-// import { useSelector } from "react-redux";
-// import { RootState } from "@/redux/store";
-// import { IModule } from "@/models/User/user.model";
 import { routeNames } from "@/router/routes-names";
 import toast from "react-hot-toast";
 import { appVersion } from "@/common/constants";
@@ -11,7 +7,7 @@ import { useSelector } from "react-redux";
 import { FaSignOutAlt, FaClipboardList } from "react-icons/fa";
 import type { IModule } from "@/models/User/user.model";
 import { AiFillHome } from "react-icons/ai";
-import { BsBox2Fill, BsChatLeftFill } from "react-icons/bs";
+import { BsBox2Fill } from "react-icons/bs";
 import { BiSolidCalendarCheck } from "react-icons/bi";
 
 
@@ -57,7 +53,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                         {module.name === "business_owner" && <AiFillHome />}
                         {module.name === "stock" && <BsBox2Fill />}
                         {module.name === "calendar" && <BiSolidCalendarCheck />}
-                        {module.name === "chats" && <BsChatLeftFill />}
                         {module.name === "orders" && <FaClipboardList />}
                         {<span className={`sm:block ${!isOpen && "text-xs text-center"}`}>
                             {module.label}

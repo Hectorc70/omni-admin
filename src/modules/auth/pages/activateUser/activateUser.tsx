@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 
 // import logo from '@/assets/logo.png'
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import FormInput from "@/common/components/input";
 import { Button } from "@/common/components/button";
 import { FaEye } from "react-icons/fa";
@@ -11,15 +11,16 @@ import { FaEye } from "react-icons/fa";
 import { useState } from "react";
 
 import { routeNames } from "@/router/routes-names";
-import { CANCELLED_REQUEST, handleError } from "@/common/utils/errors.util";
+import { CANCELLED_REQUEST } from "@/common/utils/errors.util";
 import AuthService from "../../services/auth.service";
 type FormValues = {
-  email: string,
   password: string,
 }
-const LoginPage: React.FC = () => {
+const ActivateUserPage: React.FC = () => {
 
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>()
   const [typePassword, setTypePassword] = useState('password')
   const [loading, setLoading] = useState(false)
@@ -34,13 +35,19 @@ const LoginPage: React.FC = () => {
     }
   }
 
-  const onLogin = async (data:FormValues) => {
+  const onSubmit = async ({ password }: FormValues) => {
+    if (password.length < 6) {
+      toast.error("La contraseña debe tener al menos 6 caracteres")
+      return
+    }
+    setLoading(true)
     if (loading) {
       return
     }
     try {
-      await AuthService.login(data.email, data.password)
-      navigate(routeNames.homePage)
+      await AuthService.activateUser(token!.toString(), password)
+      toast.success("Usuario activado correctamente")
+      navigate(routeNames.loginPage)
       setLoading(false)
     } catch (error: any) {
       setLoading(false)
@@ -51,26 +58,8 @@ const LoginPage: React.FC = () => {
   }
   return (<>
     <div className="w-full h-full flex flex-col items-center p-10">
-      <h4 className="text-2xl font-bold text-colorText my-20">Iniciar sesión</h4>
-      <form onSubmit={handleSubmit(onLogin)} className="w-full flex flex-col gap-1 px-20">
-        <FormInput label="Correo electrónico"
-          name="email"
-          type="email"
-          placeholder="Ingrese su correo"
-          error={errors.email} register={register('email',
-            {
-              required: {
-                value: true,
-                message: "El correo es requerido"
-              },
-              validate: (value: string) => {
-                const pattern2 = /^[^\s]+$/;
-                if (!value.match(pattern2)) {
-                  return 'El correo no puede contener espacios';
-                }
-                return true;
-              },
-            })} />
+      <h4 className="text-2xl font-bold text-colorText my-20">Activar usuario</h4>
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-1 px-20">
         <FormInput
           label="Contraseña"
           name="password"
@@ -85,6 +74,10 @@ const LoginPage: React.FC = () => {
                 value: true,
                 message: "La contraseña es requerida"
               },
+              minLength: {
+                value: 6,
+                message: "La contraseña debe tener al menos 6 caracteres"
+              },
               validate: (value: string) => {
                 const pattern2 = /^[^\s]+$/;
                 if (!value.match(pattern2)) {
@@ -94,7 +87,7 @@ const LoginPage: React.FC = () => {
               },
             })} />
         <div className="flex justify-end mt-5">
-          <Button isLoading={loading} type="submit" variant="primary" size="lg">Iniciar sesión</Button>
+          <Button isLoading={loading} type="submit" variant="primary" size="lg">Aceptar</Button>
         </div>
 
       </form>
@@ -103,4 +96,4 @@ const LoginPage: React.FC = () => {
 }
 
 
-export default LoginPage
+export default ActivateUserPage
