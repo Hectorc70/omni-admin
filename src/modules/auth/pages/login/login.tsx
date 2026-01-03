@@ -39,8 +39,9 @@ const LoginPage: React.FC = () => {
       return
     }
     try {
+      setLoading(true)
       await AuthService.login(data.email, data.password)
-      navigate(routeNames.homePage)
+      navigate(routeNames.homePage, { replace: true })
       setLoading(false)
     } catch (error: any) {
       setLoading(false)
