@@ -45,7 +45,7 @@ jobs:
       - name: copy builds to server
         id: deploy
         run: |
-          scp -r dist/* root@"${{ secrets.HOST }}":/var/www/negocios.valanzacomunidad.com
+          scp -r dist/* root@"${{ secrets.HOST }}":/var/www/admin.omniassisto.com
           echo "** ¡Hola! Se ha realizado la conexión SSH correctamente. **"
         continue-on-error: false
       # ✅ Notificación de éxito global
