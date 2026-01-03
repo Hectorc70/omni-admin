@@ -11,7 +11,7 @@ import { FaEye } from "react-icons/fa";
 import { useState } from "react";
 
 import { routeNames } from "@/router/routes-names";
-import { CANCELLED_REQUEST, handleError } from "@/common/utils/errors.util";
+import { CANCELLED_REQUEST } from "@/common/utils/errors.util";
 import AuthService from "../../services/auth.service";
 type FormValues = {
   email: string,

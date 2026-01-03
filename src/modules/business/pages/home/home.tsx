@@ -7,8 +7,6 @@ import BusinessForm from "./components/business-form";
 import { useUser } from "@/hooks/use-user";
 import CardContainerComponent from "@/common/components/card-container";
 import BusinessContactForm from "./components/business-contact-form";
-import { BusinessHoursComponent } from "./components/business-hours";
-import Chip from "@/common/components/chip";
 
 
 const HomePage: React.FC = () => {
