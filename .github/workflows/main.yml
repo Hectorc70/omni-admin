@@ -1,0 +1,65 @@
+name: deployment production
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@master
+        
+      - name: Set up Node.js 👨🏻‍💻
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm' 
+      - name: Install dependencies 👨🏻‍💻
+        run: npm ci
+        continue-on-error: false
+      
+      - name: Build app 🏗️
+        run: npm run build
+        env:
+          VITE_BASE_API: https://api.omniassisto.com
+          VITE_GOOGLE_MAPS_API_KEY: AIzaSyDG8ZNpNvt6YLCCP3h5Mphri6GU_BRynN0
+          VITE_FIREBASE_APIKEY: AIzaSyCgdINMRQvZxsa3XkA6DRZAgQjvQEQ7R8A
+        
+      
+
+      
+      - name: View dist folder contents 👀
+        run: ls -l dist
+
+      - name: SETUP SSH 💻
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_PRIV_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PUB_KEY }}" > ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa.pub
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+      
+      - name: copy builds to server
+        id: deploy
+        run: |
+          scp -r dist/* root@"${{ secrets.HOST }}":/var/www/negocios.valanzacomunidad.com
+          echo "** ¡Hola! Se ha realizado la conexión SSH correctamente. **"
+        continue-on-error: false
+      # ✅ Notificación de éxito global
+      - name: Notify Success ✅
+        if: success()
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="✅ *VALANZA ADMIN* || Despliegue exitoso en Production 🚀%0ARepo: ${{ github.repository }}%0ABranch: ${{ github.ref_name }}"
+      # ⚠️ Notificación de fallo global
+      - name: Notify Failure ❌
+        if: failure()
+        run: |
+          LOG_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="❌ *VALANZA ADMIN* || Falló el despliegue 🚨%0A🧱 Job: ${{ github.job }}%0A📦 Estado: ${{ job.status }}%0ARepo: ${{ github.repository }}%0ABranch: ${{ github.ref_name }}%0A🔍 [Ver logs en GitHub Actions]($LOG_URL)"
