@@ -54,7 +54,7 @@ jobs:
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
             -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d text="✅ *VALANZA ADMIN* || Despliegue exitoso en Production 🚀%0ARepo: ${{ github.repository }}%0ABranch: ${{ github.ref_name }}"
+            -d text="✅ *OMNI ADMIN* || Despliegue exitoso en Production 🚀%0ARepo: ${{ github.repository }}%0ABranch: ${{ github.ref_name }}"
       # ⚠️ Notificación de fallo global
       - name: Notify Failure ❌
         if: failure()
@@ -62,4 +62,4 @@ jobs:
           LOG_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
             -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d text="❌ *VALANZA ADMIN* || Falló el despliegue 🚨%0A🧱 Job: ${{ github.job }}%0A📦 Estado: ${{ job.status }}%0ARepo: ${{ github.repository }}%0ABranch: ${{ github.ref_name }}%0A🔍 [Ver logs en GitHub Actions]($LOG_URL)"
+            -d text="❌ *OMNI ADMIN* || Falló el despliegue 🚨%0A🧱 Job: ${{ github.job }}%0A📦 Estado: ${{ job.status }}%0ARepo: ${{ github.repository }}%0ABranch: ${{ github.ref_name }}%0A🔍 [Ver logs en GitHub Actions]($LOG_URL)"
