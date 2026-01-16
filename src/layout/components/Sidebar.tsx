@@ -53,7 +53,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                         {module.name === "business_customers" && <FaPeopleArrows />}
                         {module.name === "business_notifications_templates" && <IoNotificationsSharp />}
                         {module.name === "orders" && <FaClipboardList />}
-                        {<span className={`sm:block ${!isOpen && "text-xs text-center"}`}>
+                        {<span className={`sm:block ${!isOpen && "text-xs text-center truncate"}`}>
                             {module.label}
                         </span>}
                     </NavLink>

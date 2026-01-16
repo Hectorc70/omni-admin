@@ -4,7 +4,7 @@ import { ScreenStatus } from "@/types/enums";
 import { changeTitle } from "@/redux/global.slice";
 import type { AppDispatch } from "@/redux/store";
 import { useEffect, useLayoutEffect, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { TableComponent } from "@/common/components/table";
 import type { IResponsePaginate } from "@/types/response-paginate.model";

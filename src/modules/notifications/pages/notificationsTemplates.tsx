@@ -31,7 +31,7 @@ const NotificationsTemplatesPage: React.FC = () => {
     count: 0, next_page: 0, results: []
   })
   const [itemSelected, setItemSelected] = useState<INotificationTemplate>()
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<INotificationTemplate>()
+  const { register, handleSubmit, formState: { errors } } = useForm<INotificationTemplate>()
   const [statusScreenDetail, setStatusScreenDetail] = useState<ScreenStatus>(ScreenStatus.success)
   const [messageScreenDetail, setMessageScreenDetail] = useState<string>('')
   const [shoDetail, setShowDetail] = useState(false)
@@ -87,14 +87,14 @@ const NotificationsTemplatesPage: React.FC = () => {
     {
       icon: BsFillSendCheckFill,
       label: 'Enviar notificacion',
-      onClick: async (row: any) => {
+      onClick:async (row: any) => {
         await onSend(row)
       }
     },
     {
       icon: MdDelete,
       label: 'Eliminar plantilla',
-      onClick: async (row: any) => {
+      onClick:async (row: any) => {
         await onDelete(row)
       }
     }
@@ -115,7 +115,7 @@ const NotificationsTemplatesPage: React.FC = () => {
       }
     }
   }
-  const onSend = async (data: INotificationTemplate) => {
+    const onSend = async (data: INotificationTemplate) => {
     try {
       await NotificationsService.sendNotification({ uuidTemplate: data?.uuid || '' })
       toast.success('Notificacion enviada exitosamente')
@@ -140,10 +140,10 @@ const NotificationsTemplatesPage: React.FC = () => {
     }
   }
   return (<>
-    <Toaster
-      position="top-center"
-      reverseOrder={false}
-    />
+  <Toaster
+            position="top-center"
+            reverseOrder={false}
+          />
     <TableComponent data={data.results}
       columns={columns} actions={actions}
       page={pageSelected}
