@@ -4,12 +4,11 @@ import toast from "react-hot-toast";
 import { appVersion } from "@/common/constants";
 import type { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
-import { FaSignOutAlt, FaClipboardList } from "react-icons/fa";
+import { FaSignOutAlt, FaClipboardList, FaPeopleArrows } from "react-icons/fa";
 import type { IModule } from "@/models/User/user.model";
 import { AiFillHome } from "react-icons/ai";
-import { BsBox2Fill } from "react-icons/bs";
-import { BiSolidCalendarCheck } from "react-icons/bi";
 
+import { IoNotificationsSharp } from "react-icons/io5";
 
 interface SidebarProps {
     isOpen: boolean;
@@ -51,8 +50,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                         {/* Icono */}
 
                         {module.name === "business_owner" && <AiFillHome />}
-                        {module.name === "stock" && <BsBox2Fill />}
-                        {module.name === "calendar" && <BiSolidCalendarCheck />}
+                        {module.name === "business_customers" && <FaPeopleArrows />}
+                        {module.name === "business_notifications_templates" && <IoNotificationsSharp />}
                         {module.name === "orders" && <FaClipboardList />}
                         {<span className={`sm:block ${!isOpen && "text-xs text-center"}`}>
                             {module.label}

@@ -1,7 +1,6 @@
-// import { useState } from "react";
 import { Outlet } from "react-router";
 
-const StockLayout = () => {
+const CustomersLayout = () => {
 
   return (
     <>
@@ -10,4 +9,4 @@ const StockLayout = () => {
   );
 };
 
-export default StockLayout;
+export default CustomersLayout;

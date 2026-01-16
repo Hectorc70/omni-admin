@@ -5,7 +5,8 @@ export const basePaths = {
     login: '/login',
     ValidateUserPage: '/activate-user',
     register: '/register',
-    stock:'/stock',
+    customers:'/customers',
+    notificationsTemplates:'/notifications-templates',
 };
 
 export const routeNames = {
@@ -14,6 +15,6 @@ export const routeNames = {
   ValidateUserPage: basePaths.ValidateUserPage,
   registerPage: basePaths.register,
   homePage: basePaths.home,
-  stockPage: basePaths.stock,
-  productsPage:basePaths.home + '/products',
+  customersPage: basePaths.customers,
+  notificationsTemplatesPage: basePaths.notificationsTemplates
 }
