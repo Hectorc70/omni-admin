@@ -69,6 +69,7 @@ const CustomersPage: React.FC = () => {
       icon: AiFillEdit,
       label: 'Ver detalle',
       onClick: (row: any) => {
+        console.log(row)
       }
     }
   ]
