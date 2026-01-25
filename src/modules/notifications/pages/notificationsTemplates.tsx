@@ -20,6 +20,7 @@ import type { INotificationTemplate } from "@/models/Notifications/notification-
 import NotificationsService from "../services/notifications.service";
 import { BsFillSendCheckFill } from "react-icons/bs";
 import { MdDelete } from "react-icons/md";
+import FormSelect from "@/common/components/select";
 
 const NotificationsTemplatesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -31,10 +32,11 @@ const NotificationsTemplatesPage: React.FC = () => {
     count: 0, next_page: 0, results: []
   })
   const [itemSelected, setItemSelected] = useState<INotificationTemplate>()
-  const { register, handleSubmit, formState: { errors } } = useForm<INotificationTemplate>()
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<INotificationTemplate>()
   const [statusScreenDetail, setStatusScreenDetail] = useState<ScreenStatus>(ScreenStatus.success)
   const [messageScreenDetail, setMessageScreenDetail] = useState<string>('')
   const [shoDetail, setShowDetail] = useState(false)
+  const wtachTypeNotification = watch('type_notification_device')
 
 
   const getData = async (page?: number | undefined) => {
@@ -87,14 +89,14 @@ const NotificationsTemplatesPage: React.FC = () => {
     {
       icon: BsFillSendCheckFill,
       label: 'Enviar notificacion',
-      onClick:async (row: any) => {
+      onClick: async (row: any) => {
         await onSend(row)
       }
     },
     {
       icon: MdDelete,
       label: 'Eliminar plantilla',
-      onClick:async (row: any) => {
+      onClick: async (row: any) => {
         await onDelete(row)
       }
     }
@@ -108,6 +110,9 @@ const NotificationsTemplatesPage: React.FC = () => {
       setStatusScreenDetail(ScreenStatus.loading)
       await NotificationsService.createTemplate({ data })
       setStatusScreenDetail(ScreenStatus.success)
+      setShowDetail(false)
+      toast.success('Plantilla de Notificacion creada exitosamente')
+      await getData()
     } catch (error: any) {
       if (error !== CANCELLED_REQUEST) {
         setStatusScreenDetail(ScreenStatus.error)
@@ -115,7 +120,7 @@ const NotificationsTemplatesPage: React.FC = () => {
       }
     }
   }
-    const onSend = async (data: INotificationTemplate) => {
+  const onSend = async (data: INotificationTemplate) => {
     try {
       await NotificationsService.sendNotification({ uuidTemplate: data?.uuid || '' })
       toast.success('Notificacion enviada exitosamente')
@@ -139,11 +144,17 @@ const NotificationsTemplatesPage: React.FC = () => {
       }
     }
   }
+
+  useEffect(() => {
+    if (wtachTypeNotification) {
+      // reset(itemSelected)
+    }
+  }, [wtachTypeNotification])
   return (<>
-  <Toaster
-            position="top-center"
-            reverseOrder={false}
-          />
+    <Toaster
+      position="top-center"
+      reverseOrder={false}
+    />
     <TableComponent data={data.results}
       columns={columns} actions={actions}
       page={pageSelected}
@@ -152,12 +163,13 @@ const NotificationsTemplatesPage: React.FC = () => {
       limit={limitTableRegistersPerPage}
       messageError={messageScreen}
       onPageChange={(newPage: number) => onChangePage(newPage)}
+      headerRightComponent={<Button type="button" onClick={() => setShowDetail(true)}>Crear nueva notificación</Button>}
     />
 
     <ModalComponent show={shoDetail} setShow={() => setShowDetail(false)}
       disableClose={false}
       statusModal={statusScreenDetail}
-      title={itemSelected ? `Editar ${itemSelected.name_template}` : 'Crear nueva plantilla'}
+      title={itemSelected ? `Editar ${itemSelected.name_template}` : 'Crear nueva plantilla de notificación'}
       messageError={messageScreenDetail}
       onReintent={() => setStatusScreenDetail(ScreenStatus.success)}
       childConfirmButton={<Button type="button" onClick={handleSubmit(onSubmit)} >Guardar</Button>}
@@ -168,7 +180,7 @@ const NotificationsTemplatesPage: React.FC = () => {
             reverseOrder={false}
           />
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 items-top">
-            <FormInput label="Nombre del producto o servicio"
+            <FormInput label="Nombre de la plantilla"
               name="name"
               placeholder="Nombre de la plantilla"
               maxLength={80}
@@ -200,13 +212,62 @@ const NotificationsTemplatesPage: React.FC = () => {
                     message: "Cuerpo de la notificación"
                   },
                 })} />
-            {<FormFileInput label="Imagen del producto"
-              name="imagesFile"
-              error={errors.image_file} register={register('image_file',
+            <FormSelect label="Tipo de notificacion"
+              name="type_notification_device"
+              error={errors.type_notification_device}
+              register={register('type_notification_device')} options={[{
+                label: 'Envio de push notificación con imagen',
+                value: 'app_push_notification_customer'
+              }, {
+                label: 'Envio de push notificación con video',
+                value: 'app_push_notification_customer_video'
+              }]} />
+            {/* <div className="flex">
+              <FormInput label="Programar envio de notificación"
+                name="date_schedule"
+                placeholder=""
+                type="date"
+                error={errors.date_schedule} register={register('date_schedule',
+                  {
+                    required: {
+                      value: false,
+                      message: ""
+                    },
+                  })} />
+              <FormInput
+                label=""
+                name="date_schedule"
+                placeholder=""
+                type="time"
+                error={errors.date_schedule} register={register('date_schedule',
+                  {
+                    required: {
+                      value: false,
+                      message: ""
+                    },
+                  })} />
+            </div> */}
+
+            {wtachTypeNotification === 'app_push_notification_customer' && <FormFileInput label="Imagen de la notificación"
+              name="file"
+              error={errors.file} register={register('file',
                 {
                   required: {
                     value: false,
                     message: ""
+                  },
+                })} />}
+            {wtachTypeNotification === 'app_push_notification_customer_video' && <FormFileInput
+              label="Video de la notificación"
+              name="file"
+              buttonText="Seleccionar video"
+              accept="video/*"
+              maxSizeMB={20}
+              error={errors.file} register={register('file',
+                {
+                  required: {
+                    value: true,
+                    message: "El video es requerido"
                   },
                 })} />}
           </div>

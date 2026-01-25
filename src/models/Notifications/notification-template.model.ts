@@ -5,8 +5,9 @@ export interface INotificationTemplate {
   title?: string;
   body?: string;
   image?: string;
-  image_file?: FileList;
+  file?: FileList;
   is_active?: Boolean;
+  date_schedule?: string;
   type_notification_device?: string;
 }
 
@@ -18,7 +19,8 @@ export class NotificationTemplateModel implements INotificationTemplate {
   image: string = '';
   is_active: Boolean = false;
   type_notification_device: string = '';
-  image_file?: FileList | undefined;
+  date_schedule: string = '';
+  file?: FileList | undefined;
   constructor(data: INotificationTemplate) {
     if (data) {
       Object.assign(this, data);
@@ -30,8 +32,12 @@ export class NotificationTemplateModel implements INotificationTemplate {
     formData.append('name_template', this.name_template);
     formData.append('body', this.body);
     formData.append('title', this.title);
-    if (this.image_file) {
-      formData.append('image_file', this.image_file![0]);
+    formData.append('type_notification_device', this.type_notification_device);
+    if(this.date_schedule){
+      formData.append('date_schedule', this.date_schedule);
+    }
+    if (this.file) {
+      formData.append('file', this.file![0]);
     }
     return formData;
   }

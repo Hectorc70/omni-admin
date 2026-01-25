@@ -6,7 +6,7 @@ import { TiThMenu } from "react-icons/ti";
 
 
 const AppLayout = () => {
-    const [isOpenSideBar, setIsSidebarOpen] = useState(false);
+    const [isOpenSideBar, setIsSidebarOpen] = useState(true);
 
     const onOpenSideBAr = () => {
         setIsSidebarOpen(!isOpenSideBar);

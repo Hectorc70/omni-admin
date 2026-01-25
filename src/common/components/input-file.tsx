@@ -13,6 +13,7 @@ interface FormFileInputProps {
   helperText?: string;
   accept?: string;
   buttonText?: string;
+  maxSizeMB?: number;
 }
 
 const FormFileInput: React.FC<FormFileInputProps> = ({
@@ -24,15 +25,34 @@ const FormFileInput: React.FC<FormFileInputProps> = ({
   disabled = false,
   helperText,
   accept = 'image/*',
-  buttonText = 'Seleccionar archivo'
+  buttonText = 'Seleccionar archivo',
+  maxSizeMB,
 }) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const resetInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    setPreview(null);
+    setFileName('');
+  };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (maxSizeMB) {
+        const sizeMB = file.size / (1024 * 1024);
+        if (sizeMB > maxSizeMB) {
+          setLocalError(`Máximo permitido: ${maxSizeMB} MB`);
+          resetInput();
+          return;
+        }else{
+          setLocalError(null);
+        }
+      }
       setFileName(file.name);
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
@@ -96,7 +116,7 @@ const FormFileInput: React.FC<FormFileInputProps> = ({
         </div>
       )}
 
-      {error && <span className="text-red-500 text-sm mt-1">{error.message}</span>}
+      {(error || localError)  && <span className="text-red-500 text-sm mt-1">{error?.message || localError}</span>}
       {!error && helperText && (
         <span className="text-colorText text-xs mt-1">{helperText}</span>
       )}
