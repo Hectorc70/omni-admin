@@ -125,6 +125,7 @@ const NotificationsTemplatesPage: React.FC = () => {
       await NotificationsService.sendNotification({ uuidTemplate: data?.uuid || '' })
       toast.success('Notificacion enviada exitosamente')
     } catch (error: any) {
+      debugger
       if (error !== CANCELLED_REQUEST) {
         toast.error(error.toString())
       }
