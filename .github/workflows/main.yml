@@ -49,6 +49,7 @@ jobs:
             PubkeyAcceptedAlgorithms +ssh-rsa
           EOF
           chmod 600 ~/.ssh/config
+
       
       - name: copy builds to server 🚀
         id: deploy
