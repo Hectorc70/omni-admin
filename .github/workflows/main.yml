@@ -32,20 +32,31 @@ jobs:
       
       - name: View dist folder contents 👀
         run: ls -l dist
-
+      
       - name: SETUP SSH 💻
         run: |
           mkdir -p ~/.ssh/
-          echo "${{ secrets.SSH_PRIV_KEY }}" > ~/.ssh/id_rsa
-          echo "${{ secrets.SSH_PUB_KEY }}" > ~/.ssh/id_rsa.pub
+          # El '-' después de '<<' elimina la indentación de las pestañas, 
+          echo "${{ secrets.SSH_PRIV_KEY_BASE64 }}" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa.pub
-          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+          
+          ssh-keyscan -p ${{ secrets.HOST_PORT }} -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+          
+          cat <<EOF > ~/.ssh/config
+          Host production_server
+            HostName ${{ secrets.HOST }}
+            User ${{ secrets.HOST_USER }}
+            Port ${{ secrets.HOST_PORT }}
+            IdentityFile ~/.ssh/id_rsa
+            IdentitiesOnly yes
+            PubkeyAcceptedAlgorithms +ssh-rsa
+          EOF
+          chmod 600 ~/.ssh/config
       
-      - name: copy builds to server
+      - name: copy builds to server 🚀
         id: deploy
         run: |
-          scp -r dist/* root@"${{ secrets.HOST }}":/var/www/admin.omniassisto.com
+          scp  -r dist/* production_server:/var/www/admin.omniassisto.com
           echo "** ¡Hola! Se ha realizado la conexión SSH correctamente. **"
         continue-on-error: false
       # ✅ Notificación de éxito global
