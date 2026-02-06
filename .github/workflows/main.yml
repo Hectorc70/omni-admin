@@ -24,11 +24,9 @@ jobs:
         run: npm run build
         env:
           VITE_BASE_API: https://api.omniassisto.com/api/v1
-          VITE_GOOGLE_MAPS_API_KEY: AIzaSyDG8ZNpNvt6YLCCP3h5Mphri6GU_BRynN0
-          VITE_FIREBASE_APIKEY: AIzaSyCgdINMRQvZxsa3XkA6DRZAgQjvQEQ7R8A
+          VITE_GOOGLE_MAPS_API_KEY: "${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}"
+          VITE_FIREBASE_APIKEY: "${{ secrets.VITE_FIREBASE_APIKEY }}"
         
-      
-
       
       - name: View dist folder contents 👀
         run: ls -l dist
