@@ -36,7 +36,6 @@ jobs:
       - name: SETUP SSH 💻
         run: |
           mkdir -p ~/.ssh/
-          # El '-' después de '<<' elimina la indentación de las pestañas, 
           echo "${{ secrets.SSH_PRIV_KEY_BASE64 }}" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
