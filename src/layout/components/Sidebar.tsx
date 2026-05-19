@@ -6,7 +6,7 @@ import type { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { FaSignOutAlt, FaClipboardList, FaPeopleArrows } from "react-icons/fa";
 import type { IModule } from "@/models/User/user.model";
-import { AiFillHome } from "react-icons/ai";
+import { AiFillHome,AiFillProduct } from "react-icons/ai";
 
 import { IoNotificationsSharp } from "react-icons/io5";
 
@@ -52,6 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                         {module.name === "business_owner" && <AiFillHome />}
                         {module.name === "business_customers" && <FaPeopleArrows />}
                         {module.name === "business_notifications_templates" && <IoNotificationsSharp />}
+                        {module.name === "business_catalog" && <AiFillProduct />}
                         {module.name === "orders" && <FaClipboardList />}
                         {<span className={`sm:block ${!isOpen && "text-xs text-center truncate"}`}>
                             {module.label}

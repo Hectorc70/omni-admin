@@ -11,6 +11,8 @@ import StockLayout from "@/modules/customers/layout/customer.layout";
 import ValidateUserPage from "@/modules/auth/pages/activateUser/activateUser";
 import NotificationsLayout from "@/modules/notifications/layout/notifications.layout";
 import NotificationsTemplatesPage from "@/modules/notifications/pages/notificationsTemplates";
+import CatalogLayout from "@/modules/catalog/layout/catalog.layout";
+import CatalogPage from "@/modules/catalog/pages/Catalog";
 
 const router = createBrowserRouter([
   {
@@ -56,6 +58,16 @@ const router = createBrowserRouter([
           {
             path: routeNames.notificationsTemplatesPage,
             element: <NotificationsTemplatesPage />,
+          },
+        ],
+      },
+      {
+        path: routeNames.catalogPage,
+        element: <CatalogLayout />,
+        children: [
+          {
+            path: routeNames.catalogPage,
+            element: <CatalogPage />,
           },
         ],
       },

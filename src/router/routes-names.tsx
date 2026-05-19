@@ -7,6 +7,7 @@ export const basePaths = {
     register: '/register',
     customers:'/customers',
     notificationsTemplates:'/notifications-templates',
+    catalog:'/catalog',
 };
 
 export const routeNames = {
@@ -16,5 +17,6 @@ export const routeNames = {
   registerPage: basePaths.register,
   homePage: basePaths.home,
   customersPage: basePaths.customers,
-  notificationsTemplatesPage: basePaths.notificationsTemplates
+  notificationsTemplatesPage: basePaths.notificationsTemplates,
+  catalogPage: basePaths.catalog
 }
