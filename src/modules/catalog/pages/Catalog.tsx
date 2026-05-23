@@ -3,7 +3,7 @@ import { Toaster } from "react-hot-toast";
 import type { ITab } from "@/models/tab.model";
 import StockPage from "./views/Stock";
 import CategoriesPage from "./views/Categories";
-import TabsComponent from "@/common/components/tabs";
+import TabsComponent from "@/common/components/Tabs";
 
 const CatalogPage: React.FC = () => {
   const tabs: ITab[] = [
