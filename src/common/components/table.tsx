@@ -176,9 +176,9 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
   filtersComponent, applyFilters, resetFilters, activeFilters
 }) => {
   return (
-    <div className="relative overflow-x-auto p-2 w-full  py-5 bg-background">
+    <div className="relative overflow-x-auto p-2 w-full  py-5 bg-background rounded-2xl">
       {/* HEADER TABLE */}
-      <div className="flex flex-row flex-wrap justify-between bg-background p-3 rounded-lg">
+      <div className="flex flex-row flex-wrap justify-between bg-background p-3 rounded-2xl">
         {/* Buscador */}
         <div className="w-full sm:w-1/3 flex gap-2 items-start">
           <div>

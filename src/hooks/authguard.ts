@@ -5,34 +5,34 @@ import { routeNames } from '@/router/routes-names';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useUser } from './use-user';
-import { lsAccessToken, lsRefreshToken } from '@/common/constants';
+import { useDispatch } from 'react-redux';
+import { setToken } from '@/redux/auth.slice';
 
 const RequireAuth = ({ children }: any) => {
   const navigate = useNavigate()
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
-  const { fetchUser } = useUser()
-  
-
+  const { fetchUser, isAuthenticated } = useUser()
   useEffect(() => {
-    const token = localStorage.getItem(lsRefreshToken);
-    if (!token) {
-      navigate(routeNames.initPage, { replace: true });
-      return;
-    }
     const checkAuth = async () => {
       try {
         setLoading(true)
-        await AuthService.refreshToken()
-        await fetchUser()
+        if (!isAuthenticated) {
+          const response = await AuthService.refreshToken()
+          dispatch(
+            setToken(
+              response ?? ""
+            )
+          );
+          await fetchUser()
+
+        }
         setLoading(false)
-        setIsAuthenticated(true)
       } catch (error: any) {
-        setLoading(false)
-        setIsAuthenticated(false)
-        localStorage.removeItem(lsRefreshToken)
-        localStorage.removeItem(lsAccessToken)
         navigate(routeNames.loginPage, { replace: true })
+      }
+      finally {
+        setLoading(false)
       }
     };
     checkAuth();

@@ -17,6 +17,7 @@ export interface IUser {
   external_id: string;
   modules: IModule[];
   business?: IBusiness;
+  access_token?: string;
 }
 
 export class UserModel implements IUser {
@@ -29,6 +30,7 @@ export class UserModel implements IUser {
   modules: IModule[] = [];
   external_token: string='';
   business?: IBusiness;
+  access_token?: string;
 
   constructor(data: IUser) {
     if (data) {

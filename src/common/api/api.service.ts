@@ -1,21 +1,26 @@
 // src/common/lib/axios.ts
 import axios, { AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
-import { baseApi, lsAccessToken } from "@/common/constants";
+import { baseApi } from "@/common/constants";
 import AuthService from "@/modules/auth/services/auth.service";
+import { store } from "@/redux/store";
+import { setToken } from "@/redux/auth.slice";
 
 export const axiosPublic = axios.create({
   baseURL: baseApi,
+  withCredentials: true
 });
 
 // Instancia con auth
 export const axiosPrivate = axios.create({
   baseURL: baseApi,
+  withCredentials: true
 });
 
 // Interceptor para agregar token automáticamente
 axiosPrivate.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem(lsAccessToken);
+    const token =
+      store.getState().auth.access_token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -38,23 +43,23 @@ axiosPrivate.interceptors.response.use(
 
       try {
         // Intentar refrescar token desde tu servicio
-        const userData = await AuthService.refreshToken();
-        if (!userData) {
+        const response = await AuthService.refreshToken();
+        if (!response) {
           throw new Error("Token refresh failed");
         }
-
         // Guardar nuevo token
-        localStorage.setItem(lsAccessToken, userData.toString());
+        store.dispatch(
+          setToken(response)
+        );
 
         // Actualizar headers y reintentar la solicitud
         if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${userData}`;
+          originalRequest.headers.Authorization = `Bearer ${response}`;
         }
 
         return axiosPrivate(originalRequest);
       } catch (refreshError) {
         // Token inválido → cerrar sesión
-        localStorage.removeItem(lsAccessToken);
         window.location.href="/login";
         return Promise.reject(refreshError);
       }

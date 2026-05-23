@@ -20,6 +20,9 @@ const HomePage: React.FC = () => {
   const getData = async () => {
     try {
       setStatusScreen(ScreenStatus.loading)
+      if(user.uuid) {
+        return
+      }
       const userResponse = await fetchUser()
       if (!userResponse.business) {
         setShowBusinessModal(true)

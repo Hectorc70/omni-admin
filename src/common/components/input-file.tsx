@@ -14,6 +14,7 @@ interface FormFileInputProps {
   accept?: string;
   buttonText?: string;
   maxSizeMB?: number;
+  multiple?: boolean
 }
 
 const FormFileInput: React.FC<FormFileInputProps> = ({
@@ -27,46 +28,64 @@ const FormFileInput: React.FC<FormFileInputProps> = ({
   accept = 'image/*',
   buttonText = 'Seleccionar archivo',
   maxSizeMB,
+  multiple = false,
 }) => {
-  const [preview, setPreview] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string>('');
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [fileNames, setFileNames] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [localError, setLocalError] = useState<string | null>(null);
+
   const resetInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    setPreview(null);
-    setFileName('');
+    setPreviews([]);
+    setFileNames([]);
   };
 
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files || []);
+
+    if (!files.length) {
+      setPreviews([]);
+      setFileNames([]);
+      return;
+    }
+
+    const newPreviews: string[] = [];
+    const newFileNames: string[] = [];
+
+    for (const file of files) {
       if (maxSizeMB) {
         const sizeMB = file.size / (1024 * 1024);
+
         if (sizeMB > maxSizeMB) {
           setLocalError(`Máximo permitido: ${maxSizeMB} MB`);
           resetInput();
           return;
-        }else{
-          setLocalError(null);
         }
       }
-      setFileName(file.name);
+
+      newFileNames.push(file.name);
+
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
+
         reader.onloadend = () => {
-          setPreview(reader.result as string);
+          newPreviews.push(reader.result as string);
+
+          if (newPreviews.length === files.filter(f => f.type.startsWith('image/')).length) {
+            setPreviews([...newPreviews]);
+          }
         };
+
         reader.readAsDataURL(file);
-      } else {
-        setPreview(null);
       }
-    } else {
-      setPreview(null);
-      setFileName('');
     }
+
+    setLocalError(null);
+    setFileNames(newFileNames);
   };
 
   return (
@@ -91,6 +110,7 @@ const FormFileInput: React.FC<FormFileInputProps> = ({
           register.ref(e);
           fileInputRef.current = e;
         }}
+        multiple={multiple}
         className="hidden"
         disabled={disabled}
       />
@@ -98,25 +118,28 @@ const FormFileInput: React.FC<FormFileInputProps> = ({
       {/* Custom button style */}
       <div className="flex items-center gap-2">
         <Button size="sm" type='button' onClick={() => fileInputRef.current?.click()}  >{buttonText}</Button>
-        {fileName && (
+        {fileNames && (
           <span className="text-sm text-colorText truncate max-w-xs">
-            {fileName}
+            {fileNames}
           </span>
         )}
       </div>
 
       {/* Image preview */}
-      {preview && (
-        <div className="mt-3">
-          <img
-            src={preview}
-            alt="Preview"
-            className="max-h-40 max-w-full object-contain border rounded-md"
-          />
+      {previews.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {previews.map((preview, index) => (
+            <img
+              key={index}
+              src={preview}
+              alt={`Preview ${index}`}
+              className="h-24 w-24 object-cover border rounded-md"
+            />
+          ))}
         </div>
       )}
 
-      {(error || localError)  && <span className="text-red-500 text-sm mt-1">{error?.message || localError}</span>}
+      {(error || localError) && <span className="text-red-500 text-sm mt-1">{error?.message || localError}</span>}
       {!error && helperText && (
         <span className="text-colorText text-xs mt-1">{helperText}</span>
       )}

@@ -13,6 +13,7 @@ import { useState } from "react";
 import { routeNames } from "@/router/routes-names";
 import { CANCELLED_REQUEST } from "@/common/utils/errors.util";
 import AuthService from "../../services/auth.service";
+import { useUser } from "@/hooks/use-user";
 type FormValues = {
   email: string,
   password: string,
@@ -23,7 +24,7 @@ const LoginPage: React.FC = () => {
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>()
   const [typePassword, setTypePassword] = useState('password')
   const [loading, setLoading] = useState(false)
-
+  const { login } = useUser()
 
 
   const changeVisibilityPassword = () => {
@@ -34,13 +35,13 @@ const LoginPage: React.FC = () => {
     }
   }
 
-  const onLogin = async (data:FormValues) => {
+  const onLogin = async (data: FormValues) => {
     if (loading) {
       return
     }
     try {
       setLoading(true)
-      await AuthService.login(data.email, data.password)
+      await login(data.email, data.password)
       navigate(routeNames.homePage, { replace: true })
       setLoading(false)
     } catch (error: any) {
