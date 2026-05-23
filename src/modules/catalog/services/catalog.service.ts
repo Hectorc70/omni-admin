@@ -12,7 +12,7 @@ const listAllProducts = async ({ page, text_search }: { page: number, text_searc
   const signal = createAbortableRequest(key);
 
   try {
-    const response = await axiosPrivate.get(`${baseApi}/business/catalog/templates/?page=${page}&text_search=${text_search}`,
+    const response = await axiosPrivate.get(`${baseApi}/business/catalog?page=${page}&text_search=${text_search}`,
       { signal }
     )
 
@@ -49,16 +49,19 @@ const createProducts = async ({ data }: { data: IBusinessProduct }): Promise<voi
   }
 }
 
-const addImageProduct = async ({ uuid_product, file}: { uuid_product: string, file: File }): Promise<void> => { // eslint-disable-line @typescript-eslint/no-unused-vars: number, text_search: string, type_product: string }): Promise<IResponsePaginate> => {
+const addImageProduct = async ({ uuid_product, file }: { uuid_product: string, file: FileList }): Promise<void> => { // eslint-disable-line @typescript-eslint/no-unused-vars: number, text_search: string, type_product: string }): Promise<IResponsePaginate> => {
   const key = `addImageProduct${uuid_product}`;
   const signal = createAbortableRequest(key);
 
   try {
     const formData = new FormData();
-    formData.append('file_image', file)
+    for (let i = 0; i < file.length; i++) {
+      formData.append('file_image', file[i]);
+    }
+    formData.append('uuid_product', uuid_product)
     await axiosPrivate.post(`${baseApi}/business/catalog/product/`,
       formData,
-        { signal, headers: { "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>" } }
+      { signal, headers: { "Content-Type": "multipart/form-data; boundary=<calculated when request is sent>" } }
     )
 
     return;

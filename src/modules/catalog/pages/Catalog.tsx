@@ -16,8 +16,6 @@ import FormInput from "@/common/components/input";
 import FormTextarea from "@/common/components/text-area";
 import { Button } from "@/common/components/button";
 import FormFileInput from "@/common/components/input-file";
-import { BsFillSendCheckFill } from "react-icons/bs";
-import { MdDelete } from "react-icons/md";
 import FormSelect from "@/common/components/select";
 import type { IBusinessProduct } from "@/models/Business/business-product.model";
 import CatalogService from "../services/catalog.service";
@@ -32,7 +30,7 @@ const CatalogPage: React.FC = () => {
     count: 0, next_page: 0, results: []
   })
   const [itemSelected, setItemSelected] = useState<IBusinessProduct>()
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<IBusinessProduct>()
+  const { register, handleSubmit, formState: { errors } } = useForm<IBusinessProduct>()
   const [statusScreenDetail, setStatusScreenDetail] = useState<ScreenStatus>(ScreenStatus.success)
   const [messageScreenDetail, setMessageScreenDetail] = useState<string>('')
   const [shoDetail, setShowDetail] = useState(false)
@@ -58,7 +56,7 @@ const CatalogPage: React.FC = () => {
     }
   }
   useEffect(() => {
-    getData()
+    getData(1)
   }, [])
   useLayoutEffect(() => {
     dispatch(changeTitle("Stock"));
@@ -101,7 +99,7 @@ const CatalogPage: React.FC = () => {
       setStatusScreenDetail(ScreenStatus.loading)
       if (!itemSelected) {
         await CatalogService.createProducts({ data })
-        await CatalogService.addImageProduct({ uuid_product: data.uuid ?? "", file: data.imagesFile![0] })
+        await CatalogService.addImageProduct({ uuid_product: data.uuid ?? "", file: data.imagesFile ?? [] })
         toast.success('Producto creado exitosamente')
 
       } else {
@@ -132,6 +130,7 @@ const CatalogPage: React.FC = () => {
       total={data.count}
       limit={limitTableRegistersPerPage}
       messageError={messageScreen}
+      onReintent={getData}
       onPageChange={(newPage: number) => onChangePage(newPage)}
       headerRightComponent={<Button type="button" onClick={() => setShowDetail(true)}>Nuevo Producto</Button>}
     />
