@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { baseApi } from "@/common/constants";
 import { axiosPrivate } from "@/common/api/api.service";
 import { CANCELLED_REQUEST, handleError } from "@/common/utils/errors.util";
 import axios from "axios";
@@ -7,8 +6,9 @@ import { controllers, createAbortableRequest } from "@/common/utils/abort_contro
 import type { IResponsePaginate } from "@/types/response-paginate.model";
 import { BusinessProductModel, type IBusinessProduct } from "@/models/Business/business-product.model";
 import { EndpointsApp } from "@/common/api/endpoints";
+import type { IBusinessCategory } from "@/models/Business/business-category.model";
 
-const listAllProducts = async ({ page, text_search }: { page: number, text_search: string }): Promise<IResponsePaginate> => { // eslint-disable-line @typescript-eslint/no-unused-vars: number, text_search: string, type_product: string }): Promise<IResponsePaginate> => {
+const listAllProducts = async ({ page, text_search }: { page: number, text_search: string }): Promise<IResponsePaginate> => {
   const key = `listAllProducts${page}`;
   const signal = createAbortableRequest(key);
 
@@ -28,7 +28,7 @@ const listAllProducts = async ({ page, text_search }: { page: number, text_searc
     delete controllers[key];
   }
 }
-const createProducts = async ({ data }: { data: IBusinessProduct }): Promise<IBusinessProduct> => { // eslint-disable-line @typescript-eslint/no-unused-vars: number, text_search: string, type_product: string }): Promise<IResponsePaginate> => {
+const createProducts = async ({ data }: { data: IBusinessProduct }): Promise<IBusinessProduct> => {
   const key = `createProducts${data.name}`;
   const signal = createAbortableRequest(key);
 
@@ -50,7 +50,7 @@ const createProducts = async ({ data }: { data: IBusinessProduct }): Promise<IBu
   }
 }
 
-const addImageProduct = async ({ uuid_product, file }: { uuid_product: string, file: File  | undefined}): Promise<void> => { // eslint-disable-line @typescript-eslint/no-unused-vars: number, text_search: string, type_product: string }): Promise<IResponsePaginate> => {
+const addImageProduct = async ({ uuid_product, file }: { uuid_product: string, file: File | undefined}): Promise<void> => {
   const key = `addImageProduct${uuid_product}`;
   const signal = createAbortableRequest(key);
 
@@ -75,11 +75,54 @@ const addImageProduct = async ({ uuid_product, file }: { uuid_product: string, f
   }
 }
 
+const listAllCategories = async ({ page, text_search }: { page: number, text_search: string }): Promise<IResponsePaginate> => {
+  const key = `listAllCategories${page}`;
+  const signal = createAbortableRequest(key);
+
+  try {
+    const response = await axiosPrivate.get(`${EndpointsApp.business.categoriesFilter}?text_search=${text_search}&page=${page}`,
+      { signal }
+    )
+
+    const responseData = response.data.data as IResponsePaginate;
+    return responseData;
+  } catch (e: any) {
+    if (axios.isCancel(e) || e.name === "CanceledError" || e.name === "AbortError") {
+      return Promise.reject(CANCELLED_REQUEST);
+    }
+    throw handleError(e);
+  } finally {
+    delete controllers[key];
+  }
+}
+
+const createCategory = async ({ data }: { data: IBusinessCategory }): Promise<IBusinessCategory> => {
+  const key = `createCategory${data.name}`;
+  const signal = createAbortableRequest(key);
+
+  try {
+    const response = await axiosPrivate.post(EndpointsApp.business.categories,
+      data,
+      { signal }
+    )
+
+    return response.data.data as IBusinessCategory;
+  } catch (e: any) {
+    if (axios.isCancel(e) || e.name === "CanceledError" || e.name === "AbortError") {
+      return Promise.reject(CANCELLED_REQUEST);
+    }
+    throw handleError(e);
+  } finally {
+    delete controllers[key];
+  }
+}
 
 const CatalogService = {
   listAllProducts,
   createProducts,
-  addImageProduct
+  addImageProduct,
+  listAllCategories,
+  createCategory
 }
 
 export default CatalogService

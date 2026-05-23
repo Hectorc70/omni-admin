@@ -8,11 +8,12 @@ export const EndpointsApp = {
     activateUser: `/users/activate/`,
   },
   business: {
+    create: `/business/`,
+    update: `/business`,
     products: `/business/catalog/filter`,
     addProduct: `/business/catalog/product/`,
     addImageProduct: `/business/catalog/product/images/`,
-    categories: `/business/categories/`,
+    categories: `/business/catalog/categories/`,
+    categoriesFilter: `/business/catalog/categories/filter`,
   },
 }
-
-

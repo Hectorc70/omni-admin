@@ -12,7 +12,6 @@ import { useState } from "react";
 
 import { routeNames } from "@/router/routes-names";
 import { CANCELLED_REQUEST } from "@/common/utils/errors.util";
-import AuthService from "../../services/auth.service";
 import { useUser } from "@/hooks/use-user";
 type FormValues = {
   email: string,
