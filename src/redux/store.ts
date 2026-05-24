@@ -2,13 +2,15 @@ import { configureStore } from "@reduxjs/toolkit";
 import globalReducer from "./global.slice";
 import userReducer from "./user.slice";
 import authReducer from "./auth.slice";
+import categoriesReducer from "./categories.slice";
 
 
 export const store = configureStore({
     reducer: {
         global: globalReducer,
         user: userReducer,
-        auth: authReducer
+        auth: authReducer,
+        categories: categoriesReducer
 
     },
     middleware: (getDefaultMiddleware) =>

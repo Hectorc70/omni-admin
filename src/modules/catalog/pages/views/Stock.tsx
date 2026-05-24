@@ -10,7 +10,7 @@ import { TableComponent } from "@/common/components/table";
 import type { IResponsePaginate } from "@/types/response-paginate.model";
 import { limitTableRegistersPerPage } from "@/common/constants";
 import { AiFillEdit } from "react-icons/ai";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import ModalComponent from "@/common/components/modal";
 import FormInput from "@/common/components/input";
 import FormTextarea from "@/common/components/text-area";
@@ -19,9 +19,13 @@ import FormFileInput from "@/common/components/input-file";
 import FormSelect from "@/common/components/select";
 import type { IBusinessProduct } from "@/models/Business/business-product.model";
 import CatalogService from "../../services/catalog.service";
+import { useCategories } from "@/hooks/use-categories";
+
+const getErrorMessage = (error: unknown) => error instanceof Error ? error.toString() : String(error)
 
 const StockPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const { categories } = useCategories()
   const [statusScreen, setStatusScreen] = useState<ScreenStatus>(ScreenStatus.success)
   const [messageScreen, setMessageScreen] = useState<string>('')
 
@@ -30,11 +34,11 @@ const StockPage: React.FC = () => {
     count: 0, next_page: 0, results: []
   })
   const [itemSelected, setItemSelected] = useState<IBusinessProduct>()
-  const { register, handleSubmit, formState: { errors }, watch, reset } = useForm<IBusinessProduct>()
+  const { register, handleSubmit, formState: { errors }, control, reset } = useForm<IBusinessProduct>()
   const [statusScreenDetail, setStatusScreenDetail] = useState<ScreenStatus>(ScreenStatus.success)
   const [messageScreenDetail, setMessageScreenDetail] = useState<string>('')
   const [shoDetail, setShowDetail] = useState(false)
-  const watchTypeProduct = watch('type_product')
+  const watchTypeProduct = useWatch({ control, name: 'type_product' })
 
 
   const getData = async (page?: number | undefined) => {
@@ -48,20 +52,21 @@ const StockPage: React.FC = () => {
       )
       setData(response)
       setStatusScreen(ScreenStatus.success)
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error !== CANCELLED_REQUEST) {
         setStatusScreen(ScreenStatus.error)
-        setMessageScreen(error.toString())
-        toast.error(error.toString())
+        setMessageScreen(getErrorMessage(error))
+        toast.error(getErrorMessage(error))
       }
     }
   }
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     getData(1)
   }, [])
   useLayoutEffect(() => {
     dispatch(changeTitle("Stock"));
-  }, [])
+  }, [dispatch])
 
   const onChangePage = (page: number) => {
     setPageSelected(page)
@@ -80,7 +85,7 @@ const StockPage: React.FC = () => {
     {
       icon: AiFillEdit,
       label: 'Ver detalle',
-      onClick: (row: any) => {
+      onClick: (row: IBusinessProduct) => {
         onGetDetail(row)
       }
     },
@@ -107,6 +112,10 @@ const StockPage: React.FC = () => {
       if (itemSelected) {
         uuidProduct = itemSelected.uuid ?? ''
       }
+      if(data.category===''){
+        toast.error('Debes seleccionar una categoría')
+        return
+      }
       const selectedNewImages = !data.imagesFile || data.imagesFile.length === 0;
       const notContentOldImages = !itemSelected || !itemSelected.images_product || itemSelected.images_product.length === 0;
       if (selectedNewImages && notContentOldImages) {
@@ -119,11 +128,15 @@ const StockPage: React.FC = () => {
         uuidProduct = prod.uuid ?? ''
         toast.success('Producto creado exitosamente')
       } else {
-        // await CatalogService.updateProduct({ uuid_product: itemSelected.uuid, data })
-        // await CatalogService.addImageProduct({ uuid_product: itemSelected.uuid, file: data.imagesFile[0] })
+        if (!itemSelected.uuid) {
+          toast.error('No se encontró el identificador del producto')
+          setStatusScreenDetail(ScreenStatus.success)
+          return
+        }
+        await CatalogService.updateProduct({ uuid_product: itemSelected.uuid, data })
+        toast.success('Producto actualizado exitosamente')
       }
       try {
-        debugger
         if (data.imagesFile && data.imagesFile.length > 0) {
           const imagesFile = data.imagesFile
           for (let index = 0; index < imagesFile.length; index++) {
@@ -131,15 +144,15 @@ const StockPage: React.FC = () => {
             await CatalogService.addImageProduct({ uuid_product: uuidProduct, file: element })
           }
         }
-      } catch (error: any) {
-        toast.error(error)
+      } catch (error: unknown) {
+        toast.error(getErrorMessage(error))
       }
       setShowDetail(false)
       await getData()
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error !== CANCELLED_REQUEST) {
         setStatusScreenDetail(ScreenStatus.error)
-        setMessageScreenDetail(error.toString())
+        setMessageScreenDetail(getErrorMessage(error))
       }
     }
   }
@@ -156,10 +169,10 @@ const StockPage: React.FC = () => {
       )
       setData(response)
       setStatusScreen(ScreenStatus.success)
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error !== CANCELLED_REQUEST) {
         setStatusScreen(ScreenStatus.error)
-        setMessageScreen(error.toString())
+        setMessageScreen(getErrorMessage(error))
       }
     }
   }
@@ -230,6 +243,19 @@ const StockPage: React.FC = () => {
                 label: 'Servicio',
                 value: 3
               }]} />
+            <FormSelect label="Categoría"
+              name="category"
+              error={errors.category}
+              register={register('category')} options={[
+                {
+                  label: 'Seleccione una opción',
+                  value: ''
+                },
+                ...categories.map((category) => ({
+                  label: category.name,
+                  value: category.uuid ?? `${category.id}`
+                }))
+              ]} />
             {
               watchTypeProduct == 1 && <FormInput label="Stock"
                 name="Stock"
@@ -271,7 +297,7 @@ const StockPage: React.FC = () => {
               error={errors.imagesFile} register={register('imagesFile',
                 {
                   required: {
-                    value: true,
+                    value: itemSelected && itemSelected.images_product && itemSelected.images_product.length > 0 ? false : true,
                     message: "La imagen es requerida"
                   },
                 })} />}
@@ -306,5 +332,3 @@ const StockPage: React.FC = () => {
 }
 
 export default StockPage
-
-

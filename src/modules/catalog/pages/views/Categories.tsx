@@ -3,11 +3,10 @@ import { CANCELLED_REQUEST } from "@/common/utils/errors.util";
 import { ScreenStatus } from "@/types/enums";
 import { changeTitle } from "@/redux/global.slice";
 import type { AppDispatch } from "@/redux/store";
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { TableComponent } from "@/common/components/table";
-import type { IResponsePaginate } from "@/types/response-paginate.model";
 import { limitTableRegistersPerPage } from "@/common/constants";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { useForm } from "react-hook-form";
@@ -17,20 +16,16 @@ import { Button } from "@/common/components/button";
 import type { IBusinessCategory } from "@/models/Business/business-category.model";
 import CatalogService from "../../services/catalog.service";
 import { useConfirm } from "@/common/providers/confirm-provider";
+import { useCategories } from "@/hooks/use-categories";
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.toString() : String(error)
 
 const CategoriesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const confirm = useConfirm()
-
-  const [statusScreen, setStatusScreen] = useState<ScreenStatus>(ScreenStatus.success)
-  const [messageScreen, setMessageScreen] = useState<string>('')
+  const { categoriesData, statusScreen, messageScreen, fetchCategories } = useCategories()
 
   const [pageSelected, setPageSelected] = useState(1)
-  const [data, setData] = useState<IResponsePaginate>({
-    count: 0, next_page: 0, results: []
-  })
   const [itemSelected, setItemSelected] = useState<IBusinessCategory>()
   const { register, handleSubmit, formState: { errors }, reset } = useForm<IBusinessCategory>()
   const [statusScreenDetail, setStatusScreenDetail] = useState<ScreenStatus>(ScreenStatus.success)
@@ -39,27 +34,16 @@ const CategoriesPage: React.FC = () => {
 
   const getData = useCallback(async (page?: number | undefined) => {
     try {
-      setStatusScreen(ScreenStatus.loading)
-      const response = await CatalogService.listAllCategories(
-        {
-          page: page ? page : 1,
-          text_search: '',
-        }
-      )
-      setData(response)
-      setStatusScreen(ScreenStatus.success)
+      await fetchCategories({
+        page: page ? page : 1,
+        text_search: '',
+      })
     } catch (error: unknown) {
       if (error !== CANCELLED_REQUEST) {
-        setStatusScreen(ScreenStatus.error)
-        setMessageScreen(getErrorMessage(error))
         toast.error(getErrorMessage(error))
       }
     }
-  }, [])
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    getData(1)
-  }, [getData])
+  }, [fetchCategories])
   useLayoutEffect(() => {
     dispatch(changeTitle("Categorias"));
   }, [dispatch])
@@ -117,6 +101,11 @@ const CategoriesPage: React.FC = () => {
           setStatusScreenDetail(ScreenStatus.success)
           return
         }
+        if (data.name === itemSelected!.name) {
+          toast.error('No se puede actualizar la categoría con el mismo nombre')
+          setStatusScreenDetail(ScreenStatus.success)
+          return
+        }
         await CatalogService.updateCategory({ uuid_category: itemSelected.uuid, data })
         toast.success('Categoría actualizada exitosamente')
       } else {
@@ -124,7 +113,7 @@ const CategoriesPage: React.FC = () => {
         toast.success('Categoría creada exitosamente')
       }
       setShowDetail(false)
-      await getData()
+      await getData(pageSelected)
     } catch (error: unknown) {
       if (error !== CANCELLED_REQUEST) {
         setStatusScreenDetail(ScreenStatus.error)
@@ -149,14 +138,11 @@ const CategoriesPage: React.FC = () => {
       })
       if (!accepted) return
 
-      setStatusScreen(ScreenStatus.loading)
       await CatalogService.deleteCategory({ uuid_category: row.uuid })
       toast.success('Categoría eliminada exitosamente')
       await getData(pageSelected)
     } catch (error: unknown) {
       if (error !== CANCELLED_REQUEST) {
-        setStatusScreen(ScreenStatus.error)
-        setMessageScreen(getErrorMessage(error))
         toast.error(getErrorMessage(error))
       }
     }
@@ -164,19 +150,14 @@ const CategoriesPage: React.FC = () => {
 
   const onSearch = async (value: string) => {
     try {
-      setStatusScreen(ScreenStatus.loading)
-      const response = await CatalogService.listAllCategories(
-        {
-          page: 1,
-          text_search: value,
-        }
-      )
-      setData(response)
-      setStatusScreen(ScreenStatus.success)
+      setPageSelected(1)
+      await fetchCategories({
+        page: 1,
+        text_search: value,
+      })
     } catch (error: unknown) {
       if (error !== CANCELLED_REQUEST) {
-        setStatusScreen(ScreenStatus.error)
-        setMessageScreen(getErrorMessage(error))
+        toast.error(getErrorMessage(error))
       }
     }
   }
@@ -186,12 +167,12 @@ const CategoriesPage: React.FC = () => {
       position="top-center"
       reverseOrder={false}
     />
-    <TableComponent data={data.results}
+    <TableComponent data={categoriesData.results}
       columns={columns}
       actions={actions}
       page={pageSelected}
       status={statusScreen}
-      total={data.count}
+      total={categoriesData.count}
       limit={limitTableRegistersPerPage}
       messageError={messageScreen}
       onReintent={() => getData(pageSelected)}

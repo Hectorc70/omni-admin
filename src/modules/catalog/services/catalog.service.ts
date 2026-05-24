@@ -50,6 +50,28 @@ const createProducts = async ({ data }: { data: IBusinessProduct }): Promise<IBu
   }
 }
 
+const updateProduct = async ({ uuid_product, data }: { uuid_product: string, data: IBusinessProduct }): Promise<IBusinessProduct> => {
+  const key = `updateProduct${uuid_product}`;
+  const signal = createAbortableRequest(key);
+
+  try {
+    const dataJ = new BusinessProductModel(data).toJson();
+    const response = await axiosPrivate.put(`${EndpointsApp.business.addProduct}${uuid_product}`,
+      dataJ,
+      { signal }
+    )
+
+    return response.data.data as IBusinessProduct;
+  } catch (e: any) {
+    if (axios.isCancel(e) || e.name === "CanceledError" || e.name === "AbortError") {
+      return Promise.reject(CANCELLED_REQUEST);
+    }
+    throw handleError(e);
+  } finally {
+    delete controllers[key];
+  }
+}
+
 const addImageProduct = async ({ uuid_product, file }: { uuid_product: string, file: File | undefined}): Promise<void> => {
   const key = `addImageProduct${uuid_product}`;
   const signal = createAbortableRequest(key);
@@ -161,6 +183,7 @@ const deleteCategory = async ({ uuid_category }: { uuid_category: string }): Pro
 const CatalogService = {
   listAllProducts,
   createProducts,
+  updateProduct,
   addImageProduct,
   listAllCategories,
   createCategory,
