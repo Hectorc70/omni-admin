@@ -13,6 +13,8 @@ import NotificationsLayout from "@/modules/notifications/layout/notifications.la
 import NotificationsTemplatesPage from "@/modules/notifications/pages/notificationsTemplates";
 import CatalogLayout from "@/modules/catalog/layout/catalog.layout";
 import CatalogPage from "@/modules/catalog/pages/Catalog";
+import EventsLayout from "@/modules/events/layout/events.layout";
+import EventsPage from "@/modules/events/pages/events";
 
 const router = createBrowserRouter([
   {
@@ -68,6 +70,16 @@ const router = createBrowserRouter([
           {
             path: routeNames.catalogPage,
             element: <CatalogPage />,
+          },
+        ],
+      },
+      {
+        path: routeNames.eventsPage,
+        element: <EventsLayout />,
+        children: [
+          {
+            path: routeNames.eventsPage,
+            element: <EventsPage />,
           },
         ],
       },

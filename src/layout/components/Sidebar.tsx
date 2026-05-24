@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { appVersion } from "@/common/constants";
 import type { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
-import { FaSignOutAlt, FaClipboardList, FaPeopleArrows } from "react-icons/fa";
+import { FaSignOutAlt, FaClipboardList, FaPeopleArrows, FaCalendarAlt } from "react-icons/fa";
 import type { IModule } from "@/models/User/user.model";
 import { AiFillHome,AiFillProduct } from "react-icons/ai";
 
@@ -53,6 +53,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                         {module.name === "business_customers" && <FaPeopleArrows />}
                         {module.name === "business_notifications_templates" && <IoNotificationsSharp />}
                         {module.name === "business_catalog" && <AiFillProduct />}
+                        {module.name === "business_events" && <FaCalendarAlt />}
                         {module.name === "orders" && <FaClipboardList />}
                         {<span className={`sm:block ${!isOpen && "text-xs text-center truncate"}`}>
                             {module.label}

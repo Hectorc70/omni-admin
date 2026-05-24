@@ -97,6 +97,26 @@ const addImageProduct = async ({ uuid_product, file }: { uuid_product: string, f
   }
 }
 
+const deleteProduct = async ({ uuid_product }: { uuid_product: string }): Promise<void> => {
+  const key = `deleteProduct${uuid_product}`;
+  const signal = createAbortableRequest(key);
+
+  try {
+    await axiosPrivate.delete(`${EndpointsApp.business.addProduct}${uuid_product}`,
+      { signal }
+    )
+
+    return;
+  } catch (e: any) {
+    if (axios.isCancel(e) || e.name === "CanceledError" || e.name === "AbortError") {
+      return Promise.reject(CANCELLED_REQUEST);
+    }
+    throw handleError(e);
+  } finally {
+    delete controllers[key];
+  }
+}
+
 const listAllCategories = async ({ page, text_search }: { page: number, text_search: string }): Promise<IResponsePaginate> => {
   const key = `listAllCategories${page}`;
   const signal = createAbortableRequest(key);
@@ -185,6 +205,7 @@ const CatalogService = {
   createProducts,
   updateProduct,
   addImageProduct,
+  deleteProduct,
   listAllCategories,
   createCategory,
   updateCategory,

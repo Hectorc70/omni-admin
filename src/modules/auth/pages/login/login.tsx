@@ -8,11 +8,12 @@ import FormInput from "@/common/components/input";
 import { Button } from "@/common/components/button";
 import { FaEye } from "react-icons/fa";
 
-import { useState } from "react";
+import {  useEffect, useState } from "react";
 
 import { routeNames } from "@/router/routes-names";
 import { CANCELLED_REQUEST } from "@/common/utils/errors.util";
 import { useUser } from "@/hooks/use-user";
+import AuthService from "../../services/auth.service";
 type FormValues = {
   email: string,
   password: string,
@@ -50,6 +51,20 @@ const LoginPage: React.FC = () => {
       }
     }
   }
+
+  const init = async () => {
+    try {
+      await AuthService.refreshToken()
+      navigate(routeNames.homePage, { replace: true })
+    } catch (error: any) {
+      if (error !== CANCELLED_REQUEST) {
+        toast.error(error.toString())
+      }
+    }
+  }
+  useEffect(() => {
+    init()
+  }, [])
   return (<>
     <div className="w-full h-full flex flex-col items-center p-10">
       <h4 className="text-2xl font-bold text-colorText my-20">Iniciar sesión</h4>

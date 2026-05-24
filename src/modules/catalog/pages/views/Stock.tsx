@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import { TableComponent } from "@/common/components/table";
 import type { IResponsePaginate } from "@/types/response-paginate.model";
 import { limitTableRegistersPerPage } from "@/common/constants";
-import { AiFillEdit } from "react-icons/ai";
+import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { useForm, useWatch } from "react-hook-form";
 import ModalComponent from "@/common/components/modal";
 import FormInput from "@/common/components/input";
@@ -20,11 +20,13 @@ import FormSelect from "@/common/components/select";
 import type { IBusinessProduct } from "@/models/Business/business-product.model";
 import CatalogService from "../../services/catalog.service";
 import { useCategories } from "@/hooks/use-categories";
+import { useConfirm } from "@/common/providers/confirm-provider";
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.toString() : String(error)
 
 const StockPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const confirm = useConfirm()
   const { categories } = useCategories()
   const [statusScreen, setStatusScreen] = useState<ScreenStatus>(ScreenStatus.success)
   const [messageScreen, setMessageScreen] = useState<string>('')
@@ -79,6 +81,7 @@ const StockPage: React.FC = () => {
     { Header: 'Precio', accessor: 'price' },
     { Header: 'Stock', accessor: 'stock' },
     { Header: 'Tipo de product', accessor: 'type_product' },
+    { Header: 'Activo', accessor: 'is_active', cell: (value: boolean) => value ? 'Sí' : 'No' },
   ];
 
   const actions = [
@@ -87,6 +90,15 @@ const StockPage: React.FC = () => {
       label: 'Ver detalle',
       onClick: (row: IBusinessProduct) => {
         onGetDetail(row)
+      }
+    },
+    {
+      icon: AiFillDelete,
+      label: 'Eliminar',
+      color: 'text-red-400',
+      disabled: (row: IBusinessProduct) => row.is_active === false,
+      onClick: (row: IBusinessProduct) => {
+        onDelete(row)
       }
     },
   ]
@@ -153,6 +165,32 @@ const StockPage: React.FC = () => {
       if (error !== CANCELLED_REQUEST) {
         setStatusScreenDetail(ScreenStatus.error)
         setMessageScreenDetail(getErrorMessage(error))
+      }
+    }
+  }
+
+  const onDelete = async (row: IBusinessProduct) => {
+    try {
+      if (!row.uuid) {
+        toast.error('No se encontró el identificador del producto')
+        return
+      }
+      const accepted = await confirm({
+        title: "¿Seguro que quiere borrar?",
+        content: (
+          <span>
+            Esto eliminará el producto {row.name}
+          </span>
+        )
+      })
+      if (!accepted) return
+
+      await CatalogService.deleteProduct({ uuid_product: row.uuid })
+      toast.success('Producto eliminado exitosamente')
+      await getData(pageSelected)
+    } catch (error: unknown) {
+      if (error !== CANCELLED_REQUEST) {
+        toast.error(getErrorMessage(error))
       }
     }
   }

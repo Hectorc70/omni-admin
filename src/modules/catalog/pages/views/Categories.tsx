@@ -56,6 +56,7 @@ const CategoriesPage: React.FC = () => {
   const columns = [
     { Header: 'ID', accessor: 'uuid' },
     { Header: 'Nombre', accessor: 'name' },
+    { Header: 'Activo', accessor: 'is_active', cell: (value: boolean) => value ? 'Sí' : 'No' },
   ];
 
   const actions = [
@@ -70,6 +71,7 @@ const CategoriesPage: React.FC = () => {
       icon: AiFillDelete,
       label: 'Eliminar',
       color: 'text-red-400',
+      disabled: (row: IBusinessCategory) => row.is_active === false,
       onClick: (row: IBusinessCategory) => {
         onDelete(row)
       }

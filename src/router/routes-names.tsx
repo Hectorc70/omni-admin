@@ -8,6 +8,7 @@ export const basePaths = {
     customers:'/customers',
     notificationsTemplates:'/notifications-templates',
     catalog:'/catalog',
+    events:'/events',
 };
 
 export const routeNames = {
@@ -18,5 +19,6 @@ export const routeNames = {
   homePage: basePaths.home,
   customersPage: basePaths.customers,
   notificationsTemplatesPage: basePaths.notificationsTemplates,
-  catalogPage: basePaths.catalog
+  catalogPage: basePaths.catalog,
+  eventsPage: basePaths.events
 }

@@ -118,6 +118,7 @@ interface RowAction {
   label: string;
   onClick: (row: any) => void;
   color?: string
+  disabled?: (row: any) => boolean;
 }
 interface Column {
   Header: string;
@@ -246,7 +247,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
                   </tr>
                 )}
                 {data.map((row, index) => (
-                  <tr key={index} className="bg-background border-b mb-5   border-hintColor hover:bg-hintColor ">
+                  <tr key={index} className={`${row.is_active === false ? 'bg-red-50 text-red-700 hover:bg-red-100' : 'bg-background hover:bg-hintColor'} border-b mb-5 border-hintColor`}>
                     <td className="w-4 p-2 rounded-md">
                       <div className="flex items-center">
                       </div>
@@ -272,12 +273,14 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
                       <div className="flex items-center space-x-4 text-lg">
                         {actions?.map((action, idx) => {
                           const Icon = action.icon;
+                          const isDisabled = action.disabled?.(row) ?? false;
                           return (
                             <button
                               key={idx}
-                              onClick={() => action.onClick(row)}
+                              onClick={() => !isDisabled && action.onClick(row)}
+                              disabled={isDisabled}
 
-                              className={`cursor-pointer hover:opacity-75 ${action.color ?? "text-primary"}`}
+                              className={`${isDisabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer hover:opacity-75'} ${action.color ?? "text-primary"}`}
                               title={action.label}
                             >
                               <Icon />

@@ -15,5 +15,7 @@ export const EndpointsApp = {
     addImageProduct: `/business/catalog/product/images/`,
     categories: `/business/catalog/categories/`,
     categoriesFilter: `/business/catalog/categories/filter`,
+    events: `/business/events/`,
+    eventsFilter: `/business/events/filter`,
   },
 }
