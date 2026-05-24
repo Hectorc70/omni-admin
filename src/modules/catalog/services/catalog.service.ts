@@ -117,12 +117,55 @@ const createCategory = async ({ data }: { data: IBusinessCategory }): Promise<IB
   }
 }
 
+const updateCategory = async ({ uuid_category, data }: { uuid_category: string, data: IBusinessCategory }): Promise<IBusinessCategory> => {
+  const key = `updateCategory${uuid_category}`;
+  const signal = createAbortableRequest(key);
+
+  try {
+    const response = await axiosPrivate.put(`${EndpointsApp.business.categories}${uuid_category}`,
+      data,
+      { signal }
+    )
+
+    return response.data.data as IBusinessCategory;
+  } catch (e: any) {
+    if (axios.isCancel(e) || e.name === "CanceledError" || e.name === "AbortError") {
+      return Promise.reject(CANCELLED_REQUEST);
+    }
+    throw handleError(e);
+  } finally {
+    delete controllers[key];
+  }
+}
+
+const deleteCategory = async ({ uuid_category }: { uuid_category: string }): Promise<void> => {
+  const key = `deleteCategory${uuid_category}`;
+  const signal = createAbortableRequest(key);
+
+  try {
+    await axiosPrivate.delete(`${EndpointsApp.business.categories}${uuid_category}`,
+      { signal }
+    )
+
+    return;
+  } catch (e: any) {
+    if (axios.isCancel(e) || e.name === "CanceledError" || e.name === "AbortError") {
+      return Promise.reject(CANCELLED_REQUEST);
+    }
+    throw handleError(e);
+  } finally {
+    delete controllers[key];
+  }
+}
+
 const CatalogService = {
   listAllProducts,
   createProducts,
   addImageProduct,
   listAllCategories,
-  createCategory
+  createCategory,
+  updateCategory,
+  deleteCategory
 }
 
 export default CatalogService

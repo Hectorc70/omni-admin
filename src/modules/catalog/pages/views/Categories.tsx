@@ -9,17 +9,21 @@ import { useDispatch } from "react-redux";
 import { TableComponent } from "@/common/components/table";
 import type { IResponsePaginate } from "@/types/response-paginate.model";
 import { limitTableRegistersPerPage } from "@/common/constants";
+import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { useForm } from "react-hook-form";
 import ModalComponent from "@/common/components/modal";
 import FormInput from "@/common/components/input";
 import { Button } from "@/common/components/button";
 import type { IBusinessCategory } from "@/models/Business/business-category.model";
 import CatalogService from "../../services/catalog.service";
+import { useConfirm } from "@/common/providers/confirm-provider";
 
 const getErrorMessage = (error: unknown) => error instanceof Error ? error.toString() : String(error)
 
 const CategoriesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const confirm = useConfirm()
+
   const [statusScreen, setStatusScreen] = useState<ScreenStatus>(ScreenStatus.success)
   const [messageScreen, setMessageScreen] = useState<string>('')
 
@@ -27,6 +31,7 @@ const CategoriesPage: React.FC = () => {
   const [data, setData] = useState<IResponsePaginate>({
     count: 0, next_page: 0, results: []
   })
+  const [itemSelected, setItemSelected] = useState<IBusinessCategory>()
   const { register, handleSubmit, formState: { errors }, reset } = useForm<IBusinessCategory>()
   const [statusScreenDetail, setStatusScreenDetail] = useState<ScreenStatus>(ScreenStatus.success)
   const [messageScreenDetail, setMessageScreenDetail] = useState<string>('')
@@ -65,25 +70,59 @@ const CategoriesPage: React.FC = () => {
   }
 
   const columns = [
-    { Header: 'ID', accessor: 'id' },
+    { Header: 'ID', accessor: 'uuid' },
     { Header: 'Nombre', accessor: 'name' },
-    { Header: 'Descripción', accessor: 'description' },
   ];
+
+  const actions = [
+    {
+      icon: AiFillEdit,
+      label: 'Editar',
+      onClick: (row: IBusinessCategory) => {
+        onGetDetail(row)
+      }
+    },
+    {
+      icon: AiFillDelete,
+      label: 'Eliminar',
+      color: 'text-red-400',
+      onClick: (row: IBusinessCategory) => {
+        onDelete(row)
+      }
+    },
+  ]
+  const onGetDetail = (row: IBusinessCategory) => {
+    setStatusScreenDetail(ScreenStatus.success)
+    setMessageScreenDetail('')
+    setItemSelected(row)
+    setShowDetail(true)
+    reset(row)
+  }
 
   const onCreate = () => {
     reset({
       name: '',
-      description: '',
     });
     setMessageScreenDetail('')
     setStatusScreenDetail(ScreenStatus.success)
+    setItemSelected(undefined)
     setShowDetail(true)
   }
   const onSubmit = async (data: IBusinessCategory) => {
     try {
       setStatusScreenDetail(ScreenStatus.loading)
-      await CatalogService.createCategory({ data })
-      toast.success('Categoría creada exitosamente')
+      if (itemSelected) {
+        if (!itemSelected.uuid) {
+          toast.error('No se encontró el identificador de la categoría')
+          setStatusScreenDetail(ScreenStatus.success)
+          return
+        }
+        await CatalogService.updateCategory({ uuid_category: itemSelected.uuid, data })
+        toast.success('Categoría actualizada exitosamente')
+      } else {
+        await CatalogService.createCategory({ data })
+        toast.success('Categoría creada exitosamente')
+      }
       setShowDetail(false)
       await getData()
     } catch (error: unknown) {
@@ -94,6 +133,34 @@ const CategoriesPage: React.FC = () => {
     }
   }
 
+  const onDelete = async (row: IBusinessCategory) => {
+    try {
+      if (!row.uuid) {
+        toast.error('No se encontró el identificador de la categoría')
+        return
+      }
+      const accepted = await confirm({
+        title: "¿Seguro que quiere borrar?",
+        content: (
+          <span>
+            Esto eliminará la categoría {row.name}
+          </span>
+        )
+      })
+      if (!accepted) return
+
+      setStatusScreen(ScreenStatus.loading)
+      await CatalogService.deleteCategory({ uuid_category: row.uuid })
+      toast.success('Categoría eliminada exitosamente')
+      await getData(pageSelected)
+    } catch (error: unknown) {
+      if (error !== CANCELLED_REQUEST) {
+        setStatusScreen(ScreenStatus.error)
+        setMessageScreen(getErrorMessage(error))
+        toast.error(getErrorMessage(error))
+      }
+    }
+  }
 
   const onSearch = async (value: string) => {
     try {
@@ -121,6 +188,7 @@ const CategoriesPage: React.FC = () => {
     />
     <TableComponent data={data.results}
       columns={columns}
+      actions={actions}
       page={pageSelected}
       status={statusScreen}
       total={data.count}
@@ -135,7 +203,7 @@ const CategoriesPage: React.FC = () => {
     <ModalComponent show={shoDetail} setShow={() => setShowDetail(false)}
       disableClose={false}
       statusModal={statusScreenDetail}
-      title="Crear nueva categoría"
+      title={itemSelected ? `Editar ${itemSelected.name}` : 'Crear nueva categoría'}
       messageError={messageScreenDetail}
       onReintent={() => setStatusScreenDetail(ScreenStatus.success)}
       childConfirmButton={<Button type="button" onClick={handleSubmit(onSubmit)} >Guardar</Button>}

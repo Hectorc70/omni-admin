@@ -17,3 +17,10 @@ export enum TypeSessionProvider {
   email,
   facebook
 }
+
+export enum TypeModalMessage{
+  success,
+  error,
+  warning,
+  question
+}
