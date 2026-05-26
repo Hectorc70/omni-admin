@@ -1,6 +1,6 @@
 // import ModalComponent from "@/common/components/modal";
 import { CANCELLED_REQUEST } from "@/common/utils/errors.util";
-import { ScreenStatus } from "@/types/enums";
+import { ScreenStatus, TypeModalMessage } from "@/types/enums";
 import { changeTitle } from "@/redux/global.slice";
 import type { AppDispatch } from "@/redux/store";
 import { useEffect, useLayoutEffect, useState } from "react";
@@ -21,9 +21,13 @@ import NotificationsService from "../services/notifications.service";
 import { BsFillSendCheckFill } from "react-icons/bs";
 import { MdDelete } from "react-icons/md";
 import FormSelect from "@/common/components/select";
+import { useMessage } from "@/common/providers/message-provider";
 
 const NotificationsTemplatesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const message = useMessage()
+
+
   const [statusScreen, setStatusScreen] = useState<ScreenStatus>(ScreenStatus.success)
   const [messageScreen, setMessageScreen] = useState<string>('')
 
@@ -123,9 +127,12 @@ const NotificationsTemplatesPage: React.FC = () => {
   const onSend = async (data: INotificationTemplate) => {
     try {
       await NotificationsService.sendNotification({ uuidTemplate: data?.uuid || '' })
-      toast.success('Notificacion enviada exitosamente')
+      await message({
+        title: "Notificación enviada",
+        type: TypeModalMessage.success,
+        content: <span>Notificación enviada a todos tus usuarios</span>
+      })
     } catch (error: any) {
-      debugger
       if (error !== CANCELLED_REQUEST) {
         toast.error(error.toString())
       }
@@ -176,10 +183,7 @@ const NotificationsTemplatesPage: React.FC = () => {
       childConfirmButton={<Button type="button" onClick={handleSubmit(onSubmit)} >Guardar</Button>}
       children={
         <>
-          <Toaster
-            position="top-center"
-            reverseOrder={false}
-          />
+
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 items-top">
             <FormInput label="Nombre de la plantilla"
               name="name"

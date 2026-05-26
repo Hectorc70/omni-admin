@@ -2,7 +2,7 @@ import { ScreenStatus, TypeModalMessage } from "@/types/enums";
 import { motion } from "framer-motion"
 import { Button } from "./button";
 import LoaderComponent from "./loader";
-import { IoWarning } from "react-icons/io5";
+import { IoCheckmarkCircle, IoCloseCircle, IoHelpCircle, IoWarning } from "react-icons/io5";
 
 export
 
@@ -23,6 +23,12 @@ const ConfirmMessage: React.FC<ModalMessageComponentProps> = ({ children,
   onCancelAction, onConfirmAction,
   statusModal = ScreenStatus.error,
   messageError = 'Ocurrio algo inesperado', onReintent, typeMessageModal = TypeModalMessage.warning }) => {
+  const iconByType = {
+    [TypeModalMessage.success]: <IoCheckmarkCircle className='text-6xl text-green-500' />,
+    [TypeModalMessage.error]: <IoCloseCircle className='text-6xl text-red-500' />,
+    [TypeModalMessage.warning]: <IoWarning className='text-6xl text-yellow-500' />,
+    [TypeModalMessage.question]: <IoHelpCircle className='text-6xl text-primary' />,
+  }
 
   return (
     <div className="min-h-screen absolute">
@@ -45,7 +51,7 @@ const ConfirmMessage: React.FC<ModalMessageComponentProps> = ({ children,
           <div className="px-4 py-6 bg-hintColor rounded-md my-5">
             {statusModal === ScreenStatus.success &&
               <div className='w-full flex flex-col justify-center items-center'>
-                {typeMessageModal === TypeModalMessage.warning && <div className='mb-5 rounded-full bg-backgroundSecond  w-24 h-24 flex justify-center items-center'><IoWarning className='text-6xl text-yellow-500' /></div>}
+                <div className='mb-5 rounded-full bg-backgroundSecond  w-24 h-24 flex justify-center items-center'>{iconByType[typeMessageModal]}</div>
                 {children}
               </div>}
             {statusModal === ScreenStatus.error && <div className="w-full py-10 flex  flex-col justify-center items-center">
