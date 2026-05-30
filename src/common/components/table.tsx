@@ -86,7 +86,7 @@ const FiltersPopover: React.FC<FiltersPopoverProps> = ({
       {open && (
         <div
           id={popoverId}
-          className="absolute z-[9999] mt-2 w-full sm:w-[600px] rounded-xl border border-onBackground bg-background shadow-2xl"
+          className="absolute z-[9999] mt-2 w-[90vw] sm:w-[600px] rounded-xl border border-onBackground bg-background shadow-2xl"
           style={{ left: 0, top: "100%" }}
           role="dialog"
           aria-label="Filtros"
@@ -177,12 +177,12 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
   filtersComponent, applyFilters, resetFilters, activeFilters
 }) => {
   return (
-    <div className="relative overflow-x-auto p-2 w-full  py-5 bg-background rounded-2xl">
+    <div className="relative overflow-x-auto p-2 w-full py-5 bg-background rounded-xl">
       {/* HEADER TABLE */}
-      <div className="flex flex-row flex-wrap justify-between bg-background p-3 rounded-2xl">
+      <div className="flex flex-col lg:flex-row gap-3 justify-between bg-background p-3 rounded-lg">
         {/* Buscador */}
-        <div className="w-full sm:w-1/3 flex gap-2 items-start">
-          <div>
+        <div className="w-full lg:w-1/3 flex flex-col sm:flex-row gap-2 items-start">
+          <div className="w-full sm:w-auto">
             <input
               type="text"
               placeholder={placeholderSearch}
@@ -195,7 +195,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
                   onSearch?.((e.target as HTMLInputElement).value);
                 }
               }}
-              className="block p-2 ps-2 text-sm bg-hintColor text-colorText placeholder-colorTex border border-hintColor rounded-lg w-80  focus:ring-primary focus:outline-none  "
+              className="block p-2 ps-2 text-sm bg-hintColor text-colorText placeholder-colorTex border border-hintColor rounded-lg w-full sm:w-80 focus:ring-primary focus:outline-none"
             />
             <span className="text-xs text-colorText">
               Presiona <kbd className="bg-gray-200 px-1 rounded font-bold">Enter</kbd> para buscar
@@ -213,7 +213,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
         </div>
         {/* Componente del lado derecho */}
         {headerRightComponent && (
-          <div className="w-full sm:w-2/3 flex justify-end">
+          <div className="w-full lg:w-2/3 flex justify-start lg:justify-end">
             {headerRightComponent}
           </div>
         )}
@@ -230,7 +230,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
                   </div>
                 </th>
                 {columns.map((column) => (
-                  <th key={column.accessor.toString()} scope="col" className="px-6 py-3">
+                  <th key={column.accessor.toString()} scope="col" className="px-3 sm:px-6 py-3">
                     {column.Header}
                   </th>
                 ))}
@@ -246,8 +246,8 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
                     </td>
                   </tr>
                 )}
-                {data.map((row, index) => (
-                  <tr key={index} className={`${row.is_active === false ? 'bg-background border-b border-hintColor hover:bg-hintColor' : 'bg-background hover:bg-hintColor'} border-b mb-5 border-hintColor`}>
+                {data && data.map((row, index) => (
+                  <tr key={index} className={`${row.is_active === false ? 'bg-red-50 text-red-700 hover:bg-red-100' : 'bg-background hover:bg-hintColor'} border-b mb-5 border-hintColor`}>
                     <td className="w-4 p-2 rounded-md">
                       <div className="flex items-center">
                       </div>
@@ -263,14 +263,14 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
                       return (
                         <td
                           key={typeof column.accessor === 'string' ? column.accessor : column.Header}
-                          className={`px-6 py-4 ${column.className ?? ''}`}
+                          className={`px-3 sm:px-6 py-3 ${column.className ?? ''}`}
                         >
                           {content}
                         </td>
                       );
                     })}
                     <td className="px-6 p-2 rounded-md">
-                      <div className="flex items-center space-x-4 text-lg">
+                      <div className="flex items-center space-x-2 sm:space-x-4 text-lg">
                         {actions?.map((action, idx) => {
                           const Icon = action.icon;
                           const isDisabled = action.disabled?.(row) ?? false;
@@ -283,7 +283,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
                               className={`${isDisabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer hover:opacity-75'} ${action.color ?? "text-primary"}`}
                               title={action.label}
                             >
-                              <Icon />
+                              <Icon className="text-base sm:text-lg" />
                             </button>
                           );
                         })}
@@ -315,7 +315,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
         onPageChange &&
         page !== undefined && (
           <section className="mt-4 w-full">
-            <div className="flex justify-center items-center gap-2 flex-wrap">
+            <div className="flex justify-center items-center gap-2 flex-wrap text-sm">
               {page > 1 && (
                 <button
                   onClick={() => onPageChange(page - 1)}
