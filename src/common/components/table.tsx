@@ -220,7 +220,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
       </div>
       {/* TABLE */}
       <section className="bg-background rounded-lg mt-2 py-1">
-        <div className="max-h-[calc(100vh-320px)] overflow-y-auto">
+        <div className="max-h-[calc(100vh-340px)]  overflow-auto">
           <table className="w-full text-sm text-left rtl:text-right text-colorText mt-0 mb-5 rounded-lg">
             <thead className="sticky top-0 z-0 text-sm text-colorText uppercase bg-background rounded-lg">
               <tr>
@@ -247,7 +247,7 @@ const TableComponent: React.FC<TableComponentProps> = ({ columns,
                   </tr>
                 )}
                 {data.map((row, index) => (
-                  <tr key={index} className={`${row.is_active === false ? 'bg-red-50 text-red-700 hover:bg-red-100' : 'bg-background hover:bg-hintColor'} border-b mb-5 border-hintColor`}>
+                  <tr key={index} className={`${row.is_active === false ? 'bg-background border-b border-hintColor hover:bg-hintColor' : 'bg-background hover:bg-hintColor'} border-b mb-5 border-hintColor`}>
                     <td className="w-4 p-2 rounded-md">
                       <div className="flex items-center">
                       </div>

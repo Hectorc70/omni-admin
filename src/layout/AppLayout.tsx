@@ -14,7 +14,7 @@ const AppLayout = () => {
     return (
         <div className="flex gap-0 h-screen w-screen bg-primary px-0 m-0 overflow-auto text-onPrimary">
             {/* Sidebar */}
-            <div className={ `h-screen flex-col items-start justify-center ${isOpenSideBar ? "w-52" : "w-16"} transform transition-all duration-300 z-50`}>
+            <div className={`h-screen flex-col items-start justify-center ${isOpenSideBar ? "w-52" : "w-16"} transform transition-all duration-300 z-50`}>
                 <div
                     className=" p-4 text-onPrimary cursor-pointer w-full flex items-center justify-center"
                     onClick={onOpenSideBAr}
@@ -24,15 +24,13 @@ const AppLayout = () => {
                 <Sidebar isOpen={isOpenSideBar} />
             </div>
             {/* Main Content */}
-            <div className="flex-1 flex flex-col bg-background mr-3 my-3 rounded-2xl p-2">
+            <div className="flex-1 min-w-0 flex flex-col bg-background mr-3 my-3 rounded-2xl p-2">
                 {/* Header */}
-                <Header/>
+                <Header />
 
                 {/* Page Content */}
-                <main className="flex-1  p-1 overflow-auto w-full h-full bg-hintColor pb-2 rounded-2xl ">
-                    <div className=" w-full h-full p-2 rounded-lg ">
-                        <Outlet />
-                    </div>
+                <main className="flex-1  p-1 overflow-hidden w-full h-full bg-hintColor pb-2 rounded-2xl ">
+                    <Outlet />
                 </main>
             </div>
         </div >
