@@ -66,9 +66,9 @@ const LoginPage: React.FC = () => {
   //   init()
   // }, [])
   return (<>
-    <div className="w-full h-full flex flex-col items-center p-10">
-      <h4 className="text-2xl font-bold text-colorText my-20">Iniciar sesión</h4>
-      <form onSubmit={handleSubmit(onLogin)} className="w-full flex flex-col gap-1 px-20">
+    <div className="w-full h-full flex flex-col items-center justify-center px-4 sm:px-8 lg:px-12">
+      <h4 className="text-2xl font-bold text-colorText mt-8 mb-8 md:mt-12 md:mb-12">Iniciar sesión</h4>
+      <form onSubmit={handleSubmit(onLogin)} className="w-full max-w-md lg:max-w-lg flex flex-col gap-2">
         <FormInput label="Correo electrónico"
           name="email"
           type="email"
@@ -109,8 +109,8 @@ const LoginPage: React.FC = () => {
                 return true;
               },
             })} />
-        <div className="flex justify-end mt-5">
-          <Button isLoading={loading} type="submit" variant="primary" size="lg">Iniciar sesión</Button>
+        <div className="mt-6">
+          <Button isLoading={loading} type="submit" variant="primary" size="lg" className="w-full">Iniciar sesión</Button>
         </div>
 
       </form>

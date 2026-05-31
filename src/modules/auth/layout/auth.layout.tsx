@@ -1,23 +1,24 @@
 import { Outlet } from "react-router";
 import background from '@/assets/background_auth.jpg'
 import logo from '@/assets/logowhite.png'
-import  { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 
 const AuthLayout = () => {
 
   return (
-    <div className="flex gap-0 h-screen w-screen bg-background px-0 m-0 overflow-auto text-onPrimary  justify-between">
+    <div className="flex h-screen w-screen bg-background text-onPrimary overflow-hidden">
 
-      <div className="w-[60%] relative">
-        <div className="w-full h-full">
-          <img src={background} alt="tienda negocios valanza" className="w-full h-full object-cover"/>
+      <div className="relative hidden md:flex md:w-1/2 lg:w-3/5">
+        <div className="absolute inset-0 w-full h-full">
+          <img src={background} alt="tienda negocios omni assisto" className="w-full h-full object-cover" />
         </div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex flex-col items-center">
-          <h1 className="text-4xl font-bold mb-2">Bienvenido a</h1>
-          <img src={logo} alt="" className="w-1/3"/>
+        <div className="relative z-10 flex flex-col items-center justify-center w-full text-center px-6">
+          <h1 className="text-3xl lg:text-4xl font-bold mb-4">Bienvenido a</h1>
+          <img src={logo} alt="Omni Asisto" className="w-1/2 lg:w-1/3 max-w-xs" />
         </div>
+        <div className="absolute inset-0 bg-black/30" />
       </div>
-      <div className="w-[40%] h-full">
+      <div className="w-full md:w-1/2 lg:w-2/5 h-full flex flex-col justify-center px-4 sm:px-8 lg:px-12 overflow-y-auto">
         <Toaster />
         <Outlet />
       </div>
