@@ -6,6 +6,8 @@ import { type IUser } from "@/models/User/user.model";
 import axios from "axios";
 import { EndpointsApp } from "@/common/api/endpoints";
 
+let refreshTokenPromise: Promise<string> | null = null;
+
 const activateUser = async (token: string, password: string): Promise<void> => {
   const key = `activateUser${token}`;
   const signal = createAbortableRequest(key);
@@ -48,20 +50,21 @@ const login = async (email: string, password: string): Promise<string> => {
 
 
 const refreshToken = async (): Promise<string> => {
-  const key = `refreshToken`;
-  const signal = createAbortableRequest(key);
-  try {
-    const response = await axiosPublic.get(EndpointsApp.auth.refreshToken,{ signal}
-    )
-    return response.data.data.access_token
-  } catch (e: any) {
-    if (axios.isCancel(e) || e.name === "CanceledError" || e.name === "AbortError") {
-      return Promise.reject(CANCELLED_REQUEST);
-    }
-    throw handleError(e)
-  } finally {
-    delete controllers[key];
+  if (!refreshTokenPromise) {
+    refreshTokenPromise = axiosPublic.get(EndpointsApp.auth.refreshToken)
+      .then((response) => response.data.data.access_token as string)
+      .catch((e: any) => {
+        if (axios.isCancel(e) || e.name === "CanceledError" || e.name === "AbortError") {
+          return Promise.reject(CANCELLED_REQUEST);
+        }
+        throw handleError(e)
+      })
+      .finally(() => {
+        refreshTokenPromise = null;
+      })
   }
+
+  return refreshTokenPromise
 }
 
 const getDetailUser = async (): Promise<IUser> => {

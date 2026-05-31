@@ -19,5 +19,6 @@ export const EndpointsApp = {
     eventsFilter: `/business/events/filter`,
     promotions: `/business/promotions/`,
     promotionsFilter: `/business/promotions/filter`,
+    customers: `/business/customers/filter`,
   },
 }

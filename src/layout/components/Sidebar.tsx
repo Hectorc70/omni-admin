@@ -9,6 +9,7 @@ import type { IModule } from "@/models/User/user.model";
 import { AiFillHome,AiFillProduct } from "react-icons/ai";
 import { clearToken } from "@/redux/auth.slice";
 import { clearUser } from "@/redux/user.slice";
+import { useConfirm } from "@/common/providers/confirm-provider";
 
 import { IoNotificationsSharp } from "react-icons/io5";
 
@@ -20,8 +21,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const modulesList = useSelector((state: RootState) => state.user.modules);
+    const confirm = useConfirm();
 
-    const signOut = () => {
+    const signOut = async () => {
+        const accepted = await confirm({
+            title: "¿Seguro que quiere cerrar sesión?",
+            content: (
+                <span>
+                    Se cerrará tu sesión actual.
+                </span>
+            )
+        })
+        if (!accepted) return
+
         localStorage.clear();
         localStorage.setItem(lsForceLogout, 'true');
         dispatch(clearToken());
@@ -31,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
     }
     return (
         <aside
-            className={`max-h-full w-full text-onBackground  flex  flex-col items-center justify-between overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "w-48" : "w-16"}`}
+            className={`max-h-full w-full text-onBackground flex  flex-col items-center justify-between overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "w-48" : "w-16"}`}
         >
             {/* Logo */}
             {/* {isOpen && <div className={`flex items-center justify-center w-30`}>
