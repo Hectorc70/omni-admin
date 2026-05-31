@@ -97,6 +97,26 @@ const addImageProduct = async ({ uuid_product, file }: { uuid_product: string, f
   }
 }
 
+const deleteImageProduct = async ({ id_image }: { id_image: number }): Promise<void> => {
+  const key = `deleteImageProduct${id_image}`;
+  const signal = createAbortableRequest(key);
+
+  try {
+    await axiosPrivate.delete(`${EndpointsApp.business.addImageProduct}${id_image}`,
+      { signal }
+    )
+
+    return;
+  } catch (e: any) {
+    if (axios.isCancel(e) || e.name === "CanceledError" || e.name === "AbortError") {
+      return Promise.reject(CANCELLED_REQUEST);
+    }
+    throw handleError(e);
+  } finally {
+    delete controllers[key];
+  }
+}
+
 const deleteProduct = async ({ uuid_product }: { uuid_product: string }): Promise<void> => {
   const key = `deleteProduct${uuid_product}`;
   const signal = createAbortableRequest(key);
@@ -205,6 +225,7 @@ const CatalogService = {
   createProducts,
   updateProduct,
   addImageProduct,
+  deleteImageProduct,
   deleteProduct,
   listAllCategories,
   createCategory,

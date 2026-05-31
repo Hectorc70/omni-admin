@@ -12,10 +12,13 @@ export const authSlice = createSlice({
     setToken: (state, action: PayloadAction<string>) => {
       state.access_token = action.payload;
     },
+    clearToken: (state) => {
+      state.access_token = "";
+    },
   },
 
 
 });
 
-export const { setToken} = authSlice.actions;
+export const { setToken, clearToken} = authSlice.actions;
 export default authSlice.reducer;

@@ -1,12 +1,14 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { routeNames } from "@/router/routes-names";
 import toast from "react-hot-toast";
-import { appVersion } from "@/common/constants";
-import type { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
-import { FaSignOutAlt, FaClipboardList, FaPeopleArrows, FaCalendarAlt } from "react-icons/fa";
+import { appVersion, lsForceLogout } from "@/common/constants";
+import type { AppDispatch, RootState } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { FaSignOutAlt, FaClipboardList, FaPeopleArrows, FaCalendarAlt, FaTags } from "react-icons/fa";
 import type { IModule } from "@/models/User/user.model";
 import { AiFillHome,AiFillProduct } from "react-icons/ai";
+import { clearToken } from "@/redux/auth.slice";
+import { clearUser } from "@/redux/user.slice";
 
 import { IoNotificationsSharp } from "react-icons/io5";
 
@@ -16,11 +18,15 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
     const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
     const modulesList = useSelector((state: RootState) => state.user.modules);
 
     const signOut = () => {
         localStorage.clear();
-        navigate(routeNames.loginPage);
+        localStorage.setItem(lsForceLogout, 'true');
+        dispatch(clearToken());
+        dispatch(clearUser());
+        navigate(routeNames.loginPage, { replace: true });
         toast.success('Sesión cerrada')
     }
     return (
@@ -54,6 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                         {module.name === "business_notifications_templates" && <IoNotificationsSharp />}
                         {module.name === "business_catalog" && <AiFillProduct />}
                         {module.name === "business_events" && <FaCalendarAlt />}
+                        {module.name === "business_promotions" && <FaTags />}
                         {module.name === "orders" && <FaClipboardList />}
                         {<span className={`sm:block ${!isOpen && "text-xs text-center truncate"}`}>
                             {module.label}

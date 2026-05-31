@@ -26,10 +26,20 @@ export const userSlice = createSlice({
       state.uuid = action.payload.uuid;
       state.business = action.payload.business;
     },
+    clearUser: (state) => {
+      state.username = initialState.username;
+      state.modules = initialState.modules;
+      state.email = initialState.email;
+      state.active = initialState.active;
+      state.external_id = initialState.external_id;
+      state.uuid = initialState.uuid;
+      state.business = initialState.business;
+      state.first_name = initialState.first_name;
+    },
   },
 
 
 });
 
-export const { setUser} = userSlice.actions;
+export const { setUser, clearUser} = userSlice.actions;
 export default userSlice.reducer;

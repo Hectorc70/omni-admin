@@ -1,48 +1,50 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { lsForceLogout } from '@/common/constants';
 import AuthService from '@/modules/auth/services/auth.service';
+import { setToken } from '@/redux/auth.slice';
+import type { AppDispatch } from '@/redux/store';
 import { routeNames } from '@/router/routes-names';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { useUser } from './use-user';
-import { useDispatch } from 'react-redux';
-import { setToken } from '@/redux/auth.slice';
 
-const RequireAuth = ({ children }: any) => {
+const RequireAuth = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate()
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
   const { fetchUser, isAuthenticated } = useUser()
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
         setLoading(true)
+        if (localStorage.getItem(lsForceLogout) === 'true') {
+          setAuthorized(false)
+          navigate(routeNames.loginPage, { replace: true })
+          return
+        }
         if (!isAuthenticated) {
           const response = await AuthService.refreshToken()
-          dispatch(
-            setToken(
-              response ?? ""
-            )
-          );
+          dispatch(setToken(response ?? ""));
           await fetchUser()
-
         }
-        setLoading(false)
-      } catch (error: any) {
+        setAuthorized(true)
+      } catch {
+        setAuthorized(false)
         navigate(routeNames.loginPage, { replace: true })
-      }
-      finally {
+      } finally {
         setLoading(false)
       }
     };
     checkAuth();
-  }, [navigate]);
+  }, [dispatch, fetchUser, isAuthenticated, navigate]);
 
   if (loading) {
-    return null; // Renderizar nada durante el estado de carga
+    return null;
   }
 
-  return isAuthenticated ? children : null; // Render children only if authenticated
+  return authorized ? children : null;
 };
 
 export default RequireAuth;

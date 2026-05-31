@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
 import background from '@/assets/background_auth.jpg'
-import logo from '@/assets/logo.png'
+import logo from '@/assets/logowhite.png'
 import  { Toaster } from "react-hot-toast";
 
 const AuthLayout = () => {

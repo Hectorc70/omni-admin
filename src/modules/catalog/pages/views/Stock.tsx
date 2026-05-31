@@ -195,6 +195,39 @@ const StockPage: React.FC = () => {
     }
   }
 
+  const onDeleteImage = async (idImage?: number) => {
+    try {
+      debugger
+      if (!idImage) {
+        toast.error('No se encontró el identificador de la imagen')
+        return
+      }
+      const accepted = await confirm({
+        title: "¿Seguro que quiere borrar?",
+        content: (
+          <span>
+            Esto eliminará la imagen del producto
+          </span>
+        )
+      })
+      if (!accepted) return
+
+      await CatalogService.deleteImageProduct({ id_image: idImage })
+      toast.success('Imagen eliminada exitosamente')
+      if (itemSelected?.images_product) {
+        setItemSelected({
+          ...itemSelected,
+          images_product: itemSelected.images_product.filter((image) => image.id !== idImage)
+        })
+      }
+      await getData(pageSelected)
+    } catch (error: unknown) {
+      if (error !== CANCELLED_REQUEST) {
+        toast.error(getErrorMessage(error))
+      }
+    }
+  }
+
 
   const onSearch = async (value: string) => {
     try {
@@ -357,6 +390,21 @@ const StockPage: React.FC = () => {
                       alt="product"
                       className="w-full h-full object-cover"
                     />
+                    <button
+                      type="button"
+                      onClick={() => onDeleteImage(img.id)}
+                      className="hidden md:block absolute top-2 right-2 bg-red-600 cursor-pointer
+                      text-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition"
+                    >
+                      ✕
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteImage(img.id)}
+                      className="md:hidden absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full shadow-md"
+                    >
+                      ✕
+                    </button>
                   </div>
                 ))}
               </div>

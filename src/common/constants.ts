@@ -1,5 +1,6 @@
 import packageJson from '../../package.json';
 export const lsUsername = 'lsUsername'
+export const lsForceLogout = 'lsForceLogout'
 export const baseApi = import.meta.env.VITE_BASE_API;
 
 export const limitTableRegistersPerPage = 30

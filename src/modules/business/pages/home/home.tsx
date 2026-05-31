@@ -1,7 +1,7 @@
 import ModalComponent from "@/common/components/modal";
 import { CANCELLED_REQUEST } from "@/common/utils/errors.util";
 import { ScreenStatus } from "@/types/enums";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import BusinessForm from "./components/business-form";
 import { useUser } from "@/hooks/use-user";
@@ -10,35 +10,31 @@ import BusinessContactForm from "./components/business-contact-form";
 
 
 const HomePage: React.FC = () => {
-  const [statusScreen, setStatusScreen] = useState<ScreenStatus>(ScreenStatus.success)
-
   const [showBusinessModal, setShowBusinessModal] = useState(false)
   const [showBusinessContactModal, setShowBusinessContactModal] = useState(false)
 
   const { user, fetchUser } = useUser()
 
-  const getData = async () => {
+  const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : String(error)
+
+  const getData = useCallback(async () => {
     try {
-      setStatusScreen(ScreenStatus.loading)
-      if(user.uuid) {
-        return
-      }
       const userResponse = await fetchUser()
       if (!userResponse.business) {
         setShowBusinessModal(true)
       }
-      console.log(statusScreen.toString())
-      setStatusScreen(ScreenStatus.success)
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (error !== CANCELLED_REQUEST) {
-        setStatusScreen(ScreenStatus.error)
-        toast.error(error.toString())
+        toast.error(getErrorMessage(error))
       }
     }
-  }
+  }, [fetchUser])
+
   useEffect(() => {
-    getData()
-  }, [])
+    queueMicrotask(() => {
+      void getData()
+    })
+  }, [getData])
 
   const closeBussinessModal = async () => {
     await getData()
@@ -89,6 +85,12 @@ const HomePage: React.FC = () => {
       </CardContainerComponent>
       <CardContainerComponent title='Datos de de contacto' onEditAction={() => setShowBusinessContactModal(true)} >
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="flex flex-col">
+            <span className="font-bold text-colorText text-lg">Teléfono</span>
+            <p className="text-colorGrey text-sm">
+              {user?.business?.phone_number || "Sin teléfono"}
+            </p>
+          </div>
           {/* Address */}
           <div className="flex flex-col">
             <span className="font-bold text-colorText text-lg">Dirección</span>

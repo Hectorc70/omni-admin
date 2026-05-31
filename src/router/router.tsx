@@ -15,6 +15,8 @@ import CatalogLayout from "@/modules/catalog/layout/catalog.layout";
 import CatalogPage from "@/modules/catalog/pages/Catalog";
 import EventsLayout from "@/modules/events/layout/events.layout";
 import EventsPage from "@/modules/events/pages/events";
+import PromotionsLayout from "@/modules/promotions/layout/promotions.layout";
+import PromotionsPage from "@/modules/promotions/pages/promotions";
 
 const router = createBrowserRouter([
   {
@@ -80,6 +82,16 @@ const router = createBrowserRouter([
           {
             path: routeNames.eventsPage,
             element: <EventsPage />,
+          },
+        ],
+      },
+      {
+        path: routeNames.promotionsPage,
+        element: <PromotionsLayout />,
+        children: [
+          {
+            path: routeNames.promotionsPage,
+            element: <PromotionsPage />,
           },
         ],
       },

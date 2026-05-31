@@ -9,6 +9,7 @@ import AuthService from "@/modules/auth/services/auth.service";
 import type { IUser } from "@/models/User/user.model";
 import { useNavigate } from "react-router";
 import { routeNames } from "@/router/routes-names";
+import { lsForceLogout } from "@/common/constants";
 
 export function useUser() {
   const navigate = useNavigate();
@@ -23,24 +24,25 @@ export function useUser() {
       const response = await AuthService.getDetailUser();
       dispatch(setUser(response));
       return response;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching user:", err);
       navigate(routeNames.initPage, { replace: true });
       throw err;
     }
-  }, [dispatch]);
+  }, [dispatch, navigate]);
 
   const login = useCallback(async (email: string, password: string) => {
     try {
+      localStorage.removeItem(lsForceLogout);
       const loginResponse = await AuthService.login(email, password);
       dispatch(setToken(loginResponse));
       await fetchUser();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching user:", err);
       navigate(routeNames.initPage, { replace: true });
       throw err;
     }
-  }, [dispatch]);
+  }, [dispatch, fetchUser, navigate]);
 
   return { business: user.business, user, fetchUser, login, isAuthenticated: isAuthenticated ?? false };
 }

@@ -10,6 +10,7 @@ export interface IBusiness {
   logo?: string;
   logoFile?: FileList;
   full_address?: string;
+  phone_number?: string;
   longitude?: number;
   latitude?: number;
   business_hours: IBusinessHours[]
@@ -21,6 +22,7 @@ export class BusinessModel implements IBusiness {
   description: string = '';
   logo: string = '';
   full_address?: string;
+  phone_number?: string;
   longitude?: number;
   latitude?: number;
 
@@ -60,6 +62,9 @@ export class BusinessModel implements IBusiness {
     }
     if(this.full_address){
       formData.append('full_address', this.full_address);
+    }
+    if(this.phone_number !== undefined){
+      formData.append('phone_number', this.phone_number);
     }
     return formData
   }
